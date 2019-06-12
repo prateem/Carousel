@@ -113,7 +113,7 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
      * The total space in between each individual page indicator, in pixels.
      * Default: 10dp.
      */
-    @Dimension var indicatorCircleSpacing: Float = dpToPx(10f)
+    @Dimension var indicatorCircleSpacing: Int = dpToPx(10f).toInt()
         set(value) {
             field = value
             updateIndicatorAttributes()
@@ -132,7 +132,7 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
             indicatorCircleColor = attributes.getColor(R.styleable.ImageCarousel_indicatorCircleColor, ContextCompat.getColor(ctx, android.R.color.white))
             indicatorCircleSize = attributes.getDimension(R.styleable.ImageCarousel_indicatorCircleSize, dpToPx(5f)).toInt()
             indicatorActiveScaleFactor = attributes.getFloat(R.styleable.ImageCarousel_indicatorActiveScaleFactor, 1.8f)
-            indicatorCircleSpacing = attributes.getDimension(R.styleable.ImageCarousel_indicatorCircleSpacing, dpToPx(5f))
+            indicatorCircleSpacing = attributes.getDimension(R.styleable.ImageCarousel_indicatorCircleSpacing, dpToPx(5f)).toInt()
             attributes.recycle()
         }
     }
@@ -184,8 +184,8 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
             indicator.layoutParams = LayoutParams(indicatorCircleSize, indicatorCircleSize)
                 .apply {
                     setMargins(
-                        if (i == 0) 0 else (indicatorCircleSpacing / 2).toInt(), 0,
-                        if (i == indicatorContainer.childCount - 1) 0 else (indicatorCircleSpacing / 2).toInt(), 0)
+                        if (i == 0) 0 else (indicatorCircleSpacing / 2), 0,
+                        if (i == indicatorContainer.childCount - 1) 0 else (indicatorCircleSpacing / 2), 0)
                 }
         }
     }
@@ -217,8 +217,8 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
                     layoutParams = LayoutParams(indicatorCircleSize, indicatorCircleSize)
                         .apply {
                             setMargins(
-                                if (i == 0) 0 else (indicatorCircleSpacing / 2).toInt(), 0,
-                                if (i == imagesCount - 1) 0 else (indicatorCircleSpacing / 2).toInt(), 0)
+                                if (i == 0) 0 else (indicatorCircleSpacing / 2), 0,
+                                if (i == imagesCount - 1) 0 else (indicatorCircleSpacing / 2), 0)
                         }
                 }
                 indicator.setOnClickListener { goTo(i) }

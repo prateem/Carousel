@@ -22,10 +22,6 @@ Has multiple defined attributes that you can specify in your XML layout:
 5. `app:indicatorActiveScaleFactor` - Scale factor for the selected state of a carousel item indicator.
 6. `app:indicatorCircleSpacing` - Dimension (pixels) for the total space in between carousel item indicators.
 
-All of the above attributes can also be set through code using identically named accessors
-
-E.g. `ImageCarousel.insetIndicators = false`
-
 ## Usage
 
 #### In Layout XML
@@ -55,6 +51,14 @@ images.add(R.drawable.image3)
 
 // Let the carousel know you're ready
 carousel.setImages(images)
+
+// All of the xml attributes can also be set through code using identically named accessors
+carousel.insetIndicators = false
+carousel.offsetIndicatorsBy = dpToPx(20f).toInt()
+carousel.indicatorCircleColor = R.color.yellow
+carousel.indicatorCircleSize = dpToPx(8f).toInt()
+carousel.indicatorActiveScaleFactor = 1.5f
+carousel.indicatorCircleSpacing = dpToPx(12f).toInt()
 ```
 
 And that's all you need to do.
