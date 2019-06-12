@@ -8,7 +8,7 @@ import androidx.annotation.DrawableRes
  */
 class CarouselImageList {
     companion object Builder {
-        fun fromDrawableResList(listOfDrawableRes: List<DrawableRes>): CarouselImageList {
+        fun fromDrawableResList(@DrawableRes listOfDrawableRes: List<Int>): CarouselImageList {
             return CarouselImageList().apply {
                 listOfDrawableRes.forEach { add(it) }
             }
@@ -24,7 +24,7 @@ class CarouselImageList {
     private val items: MutableList<Any> = mutableListOf()
 
     fun clear() = items.clear()
-    fun add(drawableRes: DrawableRes) = items.add(drawableRes)
+    fun add(@DrawableRes drawableRes: Int) = items.add(drawableRes)
     fun add(imageUri: Uri) = items.add(imageUri)
     fun remove(src: Any) = items.remove(src)
     fun getList(): List<Any> = items

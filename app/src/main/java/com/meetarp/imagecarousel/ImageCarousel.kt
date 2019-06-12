@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.res.TypedArray
 import android.net.Uri
 import android.util.AttributeSet
-import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -86,6 +85,7 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
     @ColorInt var indicatorCircleColor: Int = ContextCompat.getColor(ctx, android.R.color.white)
         set(value) {
             field = value
+            imagesAdapter.setErrorTint(value)
             updateIndicatorAttributes()
         }
 
@@ -221,6 +221,7 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
                                 if (i == imagesCount - 1) 0 else (indicatorCircleSpacing / 2).toInt(), 0)
                         }
                 }
+                indicator.setOnClickListener { goTo(i) }
                 indicatorContainer.addView(indicator)
 
                 // Animate the indicator to the correct initial state
@@ -230,11 +231,15 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
 
         // Update the adapter
         imagesAdapter.setImages(images)
-        imageViewPager.post { imageViewPager.currentItem = 0 }
+        goTo(0)
     }
     // endregion
 
     // region helper methods
+    private fun goTo(pos: Int) {
+        imageViewPager.post { imageViewPager.setCurrentItem(pos, true) }
+    }
+
     private fun dpToPx(dp: Float): Float {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources.displayMetrics)
     }
