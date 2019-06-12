@@ -24,8 +24,9 @@ import androidx.viewpager2.widget.ViewPager2
  * Custom view that renders an image carousel leveraging ViewPager2.
  *
  * Image sources can be [DrawableRes] or [Uri], and can be loaded from either
- * populating a [CarouselImageList] manually and calling [setImages] or by passing the relevant
- * list to either [setImagesFromResourceList] or [setImagesFromUriList].
+ * populating a [CarouselImageList] either manually or through
+ * [CarouselImageList.fromDrawableResList] or [CarouselImageList.fromUriList]
+ * and calling [setImages].
  *
  * Also automatically creates carousel item indicators to denote the current position of the
  * carousel's ViewPager.
@@ -193,23 +194,10 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
         // This is necessary so that page indicator scaling does not get clipped by the layout bound
         val bottom = if (!insetIndicators) (indicatorCircleSize * indicatorActiveScaleFactor / 2).toInt() else 0
         setPadding(0, 0, 0, bottom)
-        Log.d("NINJA", "Set 0, 0, 0, $bottom for padding with inset: $insetIndicators and circleSize: $indicatorCircleSize and scaleFactor: $indicatorActiveScaleFactor")
     }
     // endregion
 
     // region public api
-    fun setImagesFromUriList(images: List<Uri>) {
-        val list = CarouselImageList()
-        images.forEach { list.add(it) }
-        setImages(list)
-    }
-
-    fun setImagesFromResourceList(images: List<DrawableRes>) {
-        val list = CarouselImageList()
-        images.forEach { list.add(it) }
-        setImages(list)
-    }
-
     fun setImages(images: CarouselImageList) {
         // update page indicators
         previousSelectedImage = 0
@@ -271,18 +259,6 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
     // endregion
 
     // region inner classes / components
-    /**
-     * Wrapper class for a List<Any> to make usage of [setImages] semantically clear.
-     */
-    class CarouselImageList {
-        private val items: MutableList<Any> = mutableListOf()
-
-        fun clear() { items.clear() }
-        fun add(drawableRes: DrawableRes) { items.add(drawableRes) }
-        fun add(imageUri: Uri) { items.add(imageUri) }
-        fun getList(): List<Any> { return items }
-    }
-
     /**
      * This interpolator will play an animation in reverse.
      */

@@ -9,9 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 
 internal class ImageCarouselAdapter(private val context: Context) : RecyclerView.Adapter<ImageCarouselAdapter.CarouselViewHolder>() {
-    private var carouselImages: ImageCarousel.CarouselImageList = ImageCarousel.CarouselImageList()
+    private var carouselImages: CarouselImageList = CarouselImageList()
 
-    fun setImages(images: ImageCarousel.CarouselImageList) {
+    fun setImages(images: CarouselImageList) {
         carouselImages = images
         notifyDataSetChanged()
     }
