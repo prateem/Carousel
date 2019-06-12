@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ImageCarousel">
+        <attr name="insetIndicators" format="boolean" />
+        <attr name="offsetIndicatorsBy" format="dimension" />
+        <attr name="indicatorCircleColor" format="color" />
+        <attr name="indicatorCircleSize" format="dimension" />
+        <attr name="indicatorCircleSpacing" format="dimension" />
+        <attr name="indicatorActiveScaleFactor" format="float" />
+    </declare-styleable>
+</resources>
