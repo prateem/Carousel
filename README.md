@@ -76,5 +76,5 @@ And that's all you need to do.
 * Vector Drawables do not work, since Picasso does not load vector drawables
     into ImageViews outside of placeholder or error states.
 * Images that are drastically different in size can cause the Carousel to resize when
-    Picasso needs to re-load them into a viewholder. This resizing can cause the disappearance
-    of the carousel indicators.
+    Picasso needs to re-load them into a viewholder. This only happens when the carousel
+    height is not explicitly defined (i.e. `wrap_contents`)
