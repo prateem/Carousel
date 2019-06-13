@@ -8,7 +8,7 @@
     <com.meetarp.imagecarousel.ImageCarousel
             android:id="@+id/carousel_test"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="200dp"
             app:indicatorCircleColor="?android:attr/textColorPrimary"
             app:indicatorCircleSpacing="20dp"
             app:indicatorCircleSize="8dp" />

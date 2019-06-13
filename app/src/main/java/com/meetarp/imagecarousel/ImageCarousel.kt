@@ -9,13 +9,13 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.animation.Interpolator
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
 import androidx.annotation.ColorInt
 import androidx.annotation.Dimension
 import androidx.annotation.DrawableRes
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
 
@@ -46,7 +46,7 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
     LinearLayout(ctx, attrs, defStyleAttr, defStyleRes) {
 
     // region Layout elements
-    private val component = LayoutInflater.from(ctx).inflate(R.layout.image_carousel, this, false)
+    private val component: ConstraintLayout = LayoutInflater.from(ctx).inflate(R.layout.image_carousel, this, false) as ConstraintLayout
     private val imageViewPager: ViewPager2 = component.findViewById(R.id.imagesPager)
     private val indicatorContainer: LinearLayout = component.findViewById(R.id.indicatorContainer)
     // endregion
@@ -168,13 +168,26 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
 
     // region attribute change helpers
     private fun updateIndicatorContainerLayout() {
-        indicatorContainer.layoutParams = RelativeLayout
-            .LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-            .apply {
-                addRule(if (insetIndicators) RelativeLayout.ALIGN_BOTTOM else RelativeLayout.BELOW, R.id.imagesPager)
-                setMargins(0, if (insetIndicators) topMargin else offsetIndicatorsBy,
-                    0, if (insetIndicators) offsetIndicatorsBy else bottomMargin)
+        // Update constraint layout
+        ConstraintSet().apply {
+            clone(component)
+
+            if (insetIndicators) {
+                connect(R.id.indicatorContainer, ConstraintSet.BOTTOM, R.id.imagesPager, ConstraintSet.BOTTOM, 0)
+                clear(R.id.indicatorContainer, ConstraintSet.TOP)
+            } else {
+                connect(R.id.indicatorContainer, ConstraintSet.TOP, R.id.imagesPager, ConstraintSet.BOTTOM, 0)
+                clear(R.id.indicatorContainer, ConstraintSet.BOTTOM)
             }
+
+            applyTo(component)
+        }
+
+        // Update margins based on inset/offset status.
+        (indicatorContainer.layoutParams as ConstraintLayout.LayoutParams).apply {
+            setMargins(0, if (insetIndicators) topMargin else offsetIndicatorsBy,
+                0, if (insetIndicators) offsetIndicatorsBy else bottomMargin)
+        }
     }
 
     private fun updateIndicatorAttributes() {

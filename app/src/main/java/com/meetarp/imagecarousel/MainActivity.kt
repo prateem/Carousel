@@ -11,7 +11,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val carousel = findViewById<ImageCarousel>(R.id.carousel_test)
-        carousel.insetIndicators = false
+        carousel.insetIndicators = true
 
         // Photos from Unsplash by:
         //     Joanna Kosinska
