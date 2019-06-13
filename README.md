@@ -5,13 +5,12 @@ Implemented as a custom view that renders an image carousel leveraging ViewPager
 
 Image sources can be drawable resource ids or
 [Uri](https://developer.android.com/reference/android/net/Uri#parse(java.lang.String))
-objects, and can be loaded from either populating a `CarouselImageList` either manually or through
-`CarouselImageList.fromDrawableResList` or `CarouselImageList.fromUriList`
-and calling `ImageCarousel.setImages` on the reference to the carousel that is in your layout.
+objects. They can be loaded from populating a `CarouselImageList` either manually or through
+one of the two builder methods: `CarouselImageList.fromDrawableResList` and `CarouselImageList.fromUriList`.
+Once a populated image list is available, call `ImageCarousel.setImages` on a reference to the ImageCarousel.
 
 Carousel current item indicators are also automatically created and kept in sync
 with the carousel's ViewPager.
-
 
 Has multiple defined attributes that you can specify in your XML layout:
 
@@ -72,9 +71,13 @@ carousel.indicatorCircleSpacing = dpToPx(12f).toInt()
 
 And that's all you need to do.
 
+## TODO
+* Allow click listeners for carousel images.
+
 ## Known Bugs
 * Vector Drawables do not work, since Picasso does not load vector drawables
     into ImageViews outside of placeholder or error states.
 * Images that are drastically different in size can cause the Carousel to resize when
     Picasso needs to re-load them into a viewholder. This only happens when the carousel
-    height is not explicitly defined (i.e. `wrap_contents`)
+    height is not explicitly defined (i.e. `wrap_contents`) and constituent image heights
+    are not equal.
