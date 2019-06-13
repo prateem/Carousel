@@ -58,6 +58,16 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
 
     // region attributes
     /**
+     * The color that will be applied to the background of the carousel, if visible.
+     * Default: [android.R.color.transparent]
+     */
+    @ColorInt var carouselBackgroundColor: Int = ContextCompat.getColor(ctx, android.R.color.transparent)
+        set(value) {
+            field = value
+            updateViewPagerBackground()
+        }
+
+    /**
      * If set to true, will overlay the page indicators on top of the image.
      * Default: true
      */
@@ -122,17 +132,18 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
 
     // region initialization / lifecycle
     init {
-        // If attributes were supplied in the XML, utilize them as a first-measure.
-        // Programmatically setting these attributes will predictably override these values
+        // If attributes were supplied in the XML, utilize them as a first-measure, falling back to defaults
+        // as defined above. Programmatically setting these attributes will predictably override these values
         attrs?.let {
             val attributes: TypedArray = ctx.obtainStyledAttributes(attrs, R.styleable.ImageCarousel)
-            insetIndicators = attributes.getBoolean(R.styleable.ImageCarousel_insetIndicators, true)
-            offsetIndicatorsBy = attributes.getDimension(R.styleable.ImageCarousel_offsetIndicatorsBy, dpToPx(16f)).toInt()
+            carouselBackgroundColor = attributes.getColor(R.styleable.ImageCarousel_carouselBackgroundColor, carouselBackgroundColor)
+            insetIndicators = attributes.getBoolean(R.styleable.ImageCarousel_insetIndicators, insetIndicators)
+            offsetIndicatorsBy = attributes.getDimensionPixelOffset(R.styleable.ImageCarousel_offsetIndicatorsBy, offsetIndicatorsBy)
 
-            indicatorCircleColor = attributes.getColor(R.styleable.ImageCarousel_indicatorCircleColor, ContextCompat.getColor(ctx, android.R.color.white))
-            indicatorCircleSize = attributes.getDimension(R.styleable.ImageCarousel_indicatorCircleSize, dpToPx(5f)).toInt()
-            indicatorActiveScaleFactor = attributes.getFloat(R.styleable.ImageCarousel_indicatorActiveScaleFactor, 1.8f)
-            indicatorCircleSpacing = attributes.getDimension(R.styleable.ImageCarousel_indicatorCircleSpacing, dpToPx(5f)).toInt()
+            indicatorCircleColor = attributes.getColor(R.styleable.ImageCarousel_indicatorCircleColor, indicatorCircleColor)
+            indicatorCircleSize = attributes.getDimensionPixelSize(R.styleable.ImageCarousel_indicatorCircleSize, indicatorCircleSize)
+            indicatorActiveScaleFactor = attributes.getFloat(R.styleable.ImageCarousel_indicatorActiveScaleFactor, indicatorActiveScaleFactor)
+            indicatorCircleSpacing = attributes.getDimensionPixelOffset(R.styleable.ImageCarousel_indicatorCircleSpacing, indicatorCircleSpacing)
             attributes.recycle()
         }
     }
@@ -162,6 +173,7 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
         // Now that all the setup is done, actually attach the component.
         addView(component)
         updateViewPadding()
+        updateViewPagerBackground()
         updateIndicatorContainerLayout()
     }
     // endregion
@@ -207,6 +219,10 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
         // This is necessary so that page indicator scaling does not get clipped by the layout bound
         val bottom = if (!insetIndicators) (indicatorCircleSize * indicatorActiveScaleFactor / 2).toInt() else 0
         setPadding(0, 0, 0, bottom)
+    }
+
+    private fun updateViewPagerBackground() {
+        imageViewPager.setBackgroundColor(carouselBackgroundColor)
     }
     // endregion
 

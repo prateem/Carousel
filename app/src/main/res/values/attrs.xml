@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="ImageCarousel">
+        <attr name="carouselBackgroundColor" format="color" />
         <attr name="insetIndicators" format="boolean" />
         <attr name="offsetIndicatorsBy" format="dimension" />
         <attr name="indicatorCircleColor" format="color" />

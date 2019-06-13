@@ -15,21 +15,29 @@ with the carousel's ViewPager.
 
 Has multiple defined attributes that you can specify in your XML layout:
 
-1. `app:insetIndicators` - Boolean. Determines whether or not to inset the carousel item indicators.
-2. `app:offsetIndicatorsBy` - Dimension (pixels) to offset the carousel item indicators from the ViewPager.
-3. `app:indicatorCircleColor` - Color to tint all carousel item indicators.
-4. `app:indicatorCircleSize` - Dimension (pixels) for the base size of all carousel item indicators.
-5. `app:indicatorActiveScaleFactor` - Scale factor for the selected state of a carousel item indicator.
-6. `app:indicatorCircleSpacing` - Dimension (pixels) for the total space in between carousel item indicators.
+|XML Attribute|Description|Default|
+|-------------|-----------|-------|
+|`app:carouselBackgroundColor`|The color that will be applied to the background of the carousel, if visible.|android.R.color.transparent|
+|`app:insetIndicators`|Boolean. Determines whether or not to inset the carousel item indicators.|true|
+|`app:offsetIndicatorsBy`|Dimension (pixels) to offset the carousel item indicators from the ViewPager.|16dp|
+|`app:indicatorCircleColor`|Color to tint all carousel item indicators.|android.R.color.white|
+|`app:indicatorCircleSize`|Dimension (pixels) for the base size of all carousel item indicators.|5dp|
+|`app:indicatorActiveScaleFactor`|Scale factor for the selected state of a carousel item indicator.|1.8|
+|`app:indicatorCircleSpacing`|Dimension (pixels) for the total space in between carousel item indicators.|10dp|
 
 ## Usage
 
+**Note**: It is _highly_ recommended that you constrain the height of the ImageCarousel so
+that the viewpager does not resize itself when loading images of drastically different sizes.
+
 #### In Layout XML
 ```xml
+<!-- Shown with all of the default values as described in the table above -->
 <com.meetarp.imagecarousel.ImageCarousel
         android:id="@+id/imageCarousel"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="200dp"
+        app:carouselBackgroundColor="@android:color/transparent"
         app:insetIndicators="false"
         app:offsetIndicatorsBy="16dp"
         app:indicatorCircleColor="@android:color/white"
@@ -53,9 +61,10 @@ images.add(R.drawable.image3)
 carousel.setImages(images)
 
 // All of the xml attributes can also be set through code using identically named accessors
+carousel.carouselBackgroundColor = ContextCompat.getColor(context, R.color.grey)
 carousel.insetIndicators = false
 carousel.offsetIndicatorsBy = dpToPx(20f).toInt()
-carousel.indicatorCircleColor = R.color.yellow
+carousel.indicatorCircleColor = ContextCompat.getColor(context, R.color.royal_blue)
 carousel.indicatorCircleSize = dpToPx(8f).toInt()
 carousel.indicatorActiveScaleFactor = 1.5f
 carousel.indicatorCircleSpacing = dpToPx(12f).toInt()

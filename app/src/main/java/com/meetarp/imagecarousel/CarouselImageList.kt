@@ -6,6 +6,7 @@ import androidx.annotation.DrawableRes
 /**
  * Wrapper class for a List<Any> to make usage of [ImageCarousel.setImages] semantically clear.
  */
+@Suppress("Unused")
 class CarouselImageList {
     companion object Builder {
         fun fromDrawableResList(@DrawableRes listOfDrawableRes: List<Int>): CarouselImageList {
