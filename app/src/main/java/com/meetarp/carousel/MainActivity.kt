@@ -2,6 +2,7 @@ package com.meetarp.carousel
 
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
@@ -27,5 +28,10 @@ class MainActivity : AppCompatActivity() {
         carouselImages.add(Uri.parse("https://raw.githubusercontent.com/prateem/ImageCarousel/master/app/src/main/res/raw/does_not_exist.jpg"))
 
         carousel.ofImages(carouselImages)
+        carousel.setImageClickListener(object : Carousel.ImageClickListener {
+            override fun onImageClicked(position: Int) {
+                Log.d("Carousel", "Position $position clicked")
+            }
+        })
     }
 }

@@ -17,9 +17,12 @@ import com.squareup.picasso.Picasso
 import java.lang.Exception
 
 internal class CarouselAdapter(private val context: Context) : RecyclerView.Adapter<CarouselAdapter.CarouselViewHolder>() {
+
     private var carouselImages: CarouselImageList? = null
     private var carouselViews: List<View>? = null
+
     @ColorInt private var errorTint: Int = ContextCompat.getColor(context, android.R.color.white)
+    private var imageClickListener: Carousel.ImageClickListener? = null
 
     fun setImages(images: CarouselImageList) {
         carouselImages = images
@@ -30,10 +33,15 @@ internal class CarouselAdapter(private val context: Context) : RecyclerView.Adap
     fun setViews(views: List<View>) {
         carouselViews = views
         carouselImages = null
+        notifyDataSetChanged()
     }
 
     fun setErrorTint(@ColorInt tint: Int) {
         errorTint = tint
+    }
+
+    fun setImageClickListener(listener: Carousel.ImageClickListener?) {
+        imageClickListener = listener
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CarouselViewHolder {
@@ -49,7 +57,11 @@ internal class CarouselAdapter(private val context: Context) : RecyclerView.Adap
         holder.progressBar.visibility = View.VISIBLE
         holder.error.visibility = View.GONE
 
-        if (carouselImages != null) {
+        if (carouselViews != null) {
+            holder.progressBar.visibility = View.GONE
+            holder.container.removeAllViews()
+            holder.container.addView(carouselViews!![position])
+        } else {
             val imageSource = carouselImages!!.getList()[position]
             val withCallback = object : Callback {
                 override fun onSuccess() {
@@ -57,7 +69,7 @@ internal class CarouselAdapter(private val context: Context) : RecyclerView.Adap
                 }
 
                 override fun onError(e: Exception?) {
-                    Log.v("ImageCarousel", "Displaying error image due to failure loading desired image: ", e)
+                    Log.v("Carousel", "Displaying error image due to failure loading desired image: ", e)
                     holder.container.visibility = View.GONE
                     holder.progressBar.visibility = View.GONE
                     holder.error.let {
@@ -83,10 +95,11 @@ internal class CarouselAdapter(private val context: Context) : RecyclerView.Adap
                     it.load(imageSource as Uri).into(imageView, withCallback)
                 }
             }
-        } else {
-            holder.progressBar.visibility = View.GONE
-            holder.container.removeAllViews()
-            holder.container.addView(carouselViews!![position])
+
+            imageView.setOnClickListener(null)
+            if (imageClickListener != null) {
+                imageView.setOnClickListener { imageClickListener?.onImageClicked(holder.adapterPosition) }
+            }
         }
     }
 

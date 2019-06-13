@@ -66,6 +66,14 @@ images.add(R.drawable.image3)
 // Let the carousel know you're ready
 carousel.ofImages(images)
 
+// Attach a click listener for images, if you want.
+// Any click listener that you want attached to views will have to be set on the views themselves.
+carousel.setImageClickListener(object : Carousel.ImageClickListener {
+    override fun onImageClicked(position: Int) {
+        // .. do something
+    }
+})
+
 // All of the xml attributes can also be set through code using identically named accessors
 carousel.carouselBackgroundColor = ContextCompat.getColor(context, R.color.grey)
 carousel.insetIndicators = false
@@ -77,9 +85,6 @@ carousel.indicatorCircleSpacing = dpToPx(12f).toInt()
 ```
 
 And that's all you need to do.
-
-## TODO
-* Allow click listeners for carousel images.
 
 ## Known Bugs
 * Vector Drawables do not work, since Picasso does not load vector drawables

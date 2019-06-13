@@ -38,6 +38,10 @@ import androidx.viewpager2.widget.ViewPager2
 class Carousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0, defStyleRes: Int = 0) :
     LinearLayout(ctx, attrs, defStyleAttr, defStyleRes) {
 
+    interface ImageClickListener {
+        fun onImageClicked(position: Int)
+    }
+
     // region Layout elements
     private val component: ConstraintLayout = LayoutInflater.from(ctx).inflate(R.layout.carousel, this, false) as ConstraintLayout
     private val viewPager: ViewPager2 = component.findViewById(R.id.carouselPager)
@@ -190,6 +194,9 @@ class Carousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? = nu
     // endregion
 
     // region public api
+    /**
+     * Display the images from the given list in the carousel.
+     */
     fun ofImages(images: CarouselImageList) {
         previousActiveIndex = 0
         createIndicators(images.getList().size)
@@ -197,11 +204,22 @@ class Carousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? = nu
         goTo(0)
     }
 
+    /**
+     * Display the views from the given list in the carousel.
+     */
     fun ofViews(views: List<View>) {
         previousActiveIndex = 0
         createIndicators(views.size)
         adapter.setViews(views)
         goTo(0)
+    }
+
+    /**
+     * Attach a click listener for clicks on images.
+     * Does not do anything if displaying views.
+     */
+    fun setImageClickListener(listener: ImageClickListener?) {
+        adapter.setImageClickListener(listener)
     }
     // endregion
 
