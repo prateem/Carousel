@@ -1,4 +1,4 @@
-package com.meetarp.imagecarousel
+package com.meetarp.carousel
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4

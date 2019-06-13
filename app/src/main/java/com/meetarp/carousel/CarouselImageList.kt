@@ -1,4 +1,4 @@
-package com.meetarp.imagecarousel
+package com.meetarp.carousel
 
 import android.net.Uri
 import androidx.annotation.DrawableRes

@@ -1,4 +1,4 @@
-package com.meetarp.imagecarousel
+package com.meetarp.carousel
 
 import android.net.Uri
 import android.os.Bundle
@@ -10,7 +10,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val carousel = findViewById<ImageCarousel>(R.id.carousel_test)
+        val carousel = findViewById<Carousel>(R.id.carousel_test)
         carousel.insetIndicators = true
 
         // Photos from Unsplash by:
@@ -26,6 +26,6 @@ class MainActivity : AppCompatActivity() {
         carouselImages.add(R.drawable.city_daryan_shamkhali_unsplash)
         carouselImages.add(Uri.parse("https://raw.githubusercontent.com/prateem/ImageCarousel/master/app/src/main/res/raw/does_not_exist.jpg"))
 
-        carousel.setImages(carouselImages)
+        carousel.ofImages(carouselImages)
     }
 }

@@ -1,4 +1,4 @@
-package com.meetarp.imagecarousel
+package com.meetarp.carousel
 
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
@@ -20,40 +20,33 @@ import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
 
 /**
- * Custom view that renders an image carousel leveraging ViewPager2.
+ * Custom view that renders a carousel of either images or views leveraging ViewPager2.
  *
  * Image sources can be [DrawableRes] or [Uri], and can be loaded from either
  * populating a [CarouselImageList] either manually or through
  * [CarouselImageList.fromDrawableResList] or [CarouselImageList.fromUriList]
- * and calling [setImages].
+ * and calling [Carousel.ofImages].
+ *
+ * Views can be loaded into the carousel by passing a [List] of [View] objects to [Carousel.ofViews].
  *
  * Also automatically creates carousel item indicators to denote the current position of the
  * carousel's ViewPager.
  *
- * Has multiple defined app:attributes:
- *
- * 1. app:[insetIndicators] - Boolean. Determines whether or not to inset the carousel item indicators.
- * 2. app:[offsetIndicatorsBy] - Dimension (pixels) to offset the carousel item indicators from the ViewPager.
- * 3. app:[indicatorCircleColor] - Color to tint all carousel item indicators.
- * 4. app:[indicatorCircleSize] - Dimension (pixels) for the base size of all carousel item indicators.
- * 5. app:[indicatorActiveScaleFactor] - Scale factor for the selected state of a carousel item indicator.
- * 6. app:[indicatorCircleSpacing] - Dimension (pixels) for the total space in between carousel item indicators.
- *
  * @author Prateem Shrestha (prateems@gmail.com)
  */
 @Suppress("MemberVisibilityCanBePrivate", "Unused")
-class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0, defStyleRes: Int = 0) :
+class Carousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0, defStyleRes: Int = 0) :
     LinearLayout(ctx, attrs, defStyleAttr, defStyleRes) {
 
     // region Layout elements
-    private val component: ConstraintLayout = LayoutInflater.from(ctx).inflate(R.layout.image_carousel, this, false) as ConstraintLayout
-    private val imageViewPager: ViewPager2 = component.findViewById(R.id.imagesPager)
+    private val component: ConstraintLayout = LayoutInflater.from(ctx).inflate(R.layout.carousel, this, false) as ConstraintLayout
+    private val viewPager: ViewPager2 = component.findViewById(R.id.carouselPager)
     private val indicatorContainer: LinearLayout = component.findViewById(R.id.indicatorContainer)
     // endregion
 
     // region view pager and page indicator logic related
-    private val imagesAdapter = ImageCarouselAdapter(ctx)
-    private var previousSelectedImage = -1
+    private val adapter: CarouselAdapter = CarouselAdapter(ctx)
+    private var previousActiveIndex = -1
     // endregion
 
     // region attributes
@@ -74,7 +67,7 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
     var insetIndicators: Boolean = true
         set(value) {
             field = value
-            updateIndicatorContainerLayout()
+            updateConstraints()
             updateViewPadding()
         }
 
@@ -85,7 +78,7 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
     @Dimension(unit = Dimension.PX) var offsetIndicatorsBy: Int = dpToPx(16f).toInt()
         set(value) {
             field = value
-            updateIndicatorContainerLayout()
+            updateConstraints()
         }
 
     /**
@@ -95,8 +88,8 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
     @ColorInt var indicatorCircleColor: Int = ContextCompat.getColor(ctx, android.R.color.white)
         set(value) {
             field = value
-            imagesAdapter.setErrorTint(value)
-            updateIndicatorAttributes()
+            adapter.setErrorTint(value)
+            updateAllIndicatorAttributes()
         }
 
     /**
@@ -106,7 +99,7 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
     @Dimension(unit = Dimension.PX) var indicatorCircleSize: Int = dpToPx(5f).toInt()
         set(value) {
             field = value
-            updateIndicatorAttributes()
+            updateAllIndicatorAttributes()
         }
 
     /**
@@ -126,7 +119,7 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
     @Dimension var indicatorCircleSpacing: Int = dpToPx(10f).toInt()
         set(value) {
             field = value
-            updateIndicatorAttributes()
+            updateAllIndicatorAttributes()
         }
     // endregion
 
@@ -135,15 +128,15 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
         // If attributes were supplied in the XML, utilize them as a first-measure, falling back to defaults
         // as defined above. Programmatically setting these attributes will predictably override these values
         attrs?.let {
-            val attributes: TypedArray = ctx.obtainStyledAttributes(attrs, R.styleable.ImageCarousel)
-            carouselBackgroundColor = attributes.getColor(R.styleable.ImageCarousel_carouselBackgroundColor, carouselBackgroundColor)
-            insetIndicators = attributes.getBoolean(R.styleable.ImageCarousel_insetIndicators, insetIndicators)
-            offsetIndicatorsBy = attributes.getDimensionPixelOffset(R.styleable.ImageCarousel_offsetIndicatorsBy, offsetIndicatorsBy)
+            val attributes: TypedArray = ctx.obtainStyledAttributes(attrs, R.styleable.Carousel)
+            carouselBackgroundColor = attributes.getColor(R.styleable.Carousel_carouselBackgroundColor, carouselBackgroundColor)
+            insetIndicators = attributes.getBoolean(R.styleable.Carousel_insetIndicators, insetIndicators)
+            offsetIndicatorsBy = attributes.getDimensionPixelOffset(R.styleable.Carousel_offsetIndicatorsBy, offsetIndicatorsBy)
 
-            indicatorCircleColor = attributes.getColor(R.styleable.ImageCarousel_indicatorCircleColor, indicatorCircleColor)
-            indicatorCircleSize = attributes.getDimensionPixelSize(R.styleable.ImageCarousel_indicatorCircleSize, indicatorCircleSize)
-            indicatorActiveScaleFactor = attributes.getFloat(R.styleable.ImageCarousel_indicatorActiveScaleFactor, indicatorActiveScaleFactor)
-            indicatorCircleSpacing = attributes.getDimensionPixelOffset(R.styleable.ImageCarousel_indicatorCircleSpacing, indicatorCircleSpacing)
+            indicatorCircleColor = attributes.getColor(R.styleable.Carousel_indicatorCircleColor, indicatorCircleColor)
+            indicatorCircleSize = attributes.getDimensionPixelSize(R.styleable.Carousel_indicatorCircleSize, indicatorCircleSize)
+            indicatorActiveScaleFactor = attributes.getFloat(R.styleable.Carousel_indicatorActiveScaleFactor, indicatorActiveScaleFactor)
+            indicatorCircleSpacing = attributes.getDimensionPixelOffset(R.styleable.Carousel_indicatorCircleSpacing, indicatorCircleSpacing)
             attributes.recycle()
         }
     }
@@ -151,17 +144,17 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
     override fun onFinishInflate() {
         super.onFinishInflate()
         // Set up the adapter
-        imageViewPager.adapter = imagesAdapter
-        imageViewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+        viewPager.adapter = adapter
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 // Can get onPageSelected called when only 1 image is available
                 // In that case, no indicators are added, so prevent a NPE when calling getChildAt()
                 if (indicatorContainer.childCount > 0) {
-                    if (previousSelectedImage != -1) {
-                        animateIndicator(indicatorContainer.getChildAt(previousSelectedImage), reverse = true)
+                    if (previousActiveIndex != -1) {
+                        animateIndicator(indicatorContainer.getChildAt(previousActiveIndex), reverse = true)
                     }
                     animateIndicator(indicatorContainer.getChildAt(position))
-                    previousSelectedImage = position
+                    previousActiveIndex = position
                 }
             }
         })
@@ -174,44 +167,14 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
         addView(component)
         updateViewPadding()
         updateViewPagerBackground()
-        updateIndicatorContainerLayout()
+        updateConstraints()
     }
     // endregion
 
     // region attribute change helpers
-    private fun updateIndicatorContainerLayout() {
-        // Update constraint layout
-        ConstraintSet().apply {
-            clone(component)
-
-            if (insetIndicators) {
-                connect(R.id.indicatorContainer, ConstraintSet.BOTTOM, R.id.imagesPager, ConstraintSet.BOTTOM, 0)
-                clear(R.id.indicatorContainer, ConstraintSet.TOP)
-            } else {
-                connect(R.id.indicatorContainer, ConstraintSet.TOP, R.id.imagesPager, ConstraintSet.BOTTOM, 0)
-                clear(R.id.indicatorContainer, ConstraintSet.BOTTOM)
-            }
-
-            applyTo(component)
-        }
-
-        // Update margins based on inset/offset status.
-        (indicatorContainer.layoutParams as ConstraintLayout.LayoutParams).apply {
-            setMargins(0, if (insetIndicators) topMargin else offsetIndicatorsBy,
-                0, if (insetIndicators) offsetIndicatorsBy else bottomMargin)
-        }
-    }
-
-    private fun updateIndicatorAttributes() {
+    private fun updateAllIndicatorAttributes() {
         for (i in 0 until indicatorContainer.childCount) {
-            val indicator = indicatorContainer.getChildAt(i)
-            indicator.background.setTint(indicatorCircleColor)
-            indicator.layoutParams = LayoutParams(indicatorCircleSize, indicatorCircleSize)
-                .apply {
-                    setMargins(
-                        if (i == 0) 0 else (indicatorCircleSpacing / 2), 0,
-                        if (i == indicatorContainer.childCount - 1) 0 else (indicatorCircleSpacing / 2), 0)
-                }
+            updateIndicatorAttributes(indicatorContainer.getChildAt(i), i, i == indicatorContainer.childCount - 1)
         }
     }
 
@@ -222,34 +185,38 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
     }
 
     private fun updateViewPagerBackground() {
-        imageViewPager.setBackgroundColor(carouselBackgroundColor)
+        viewPager.setBackgroundColor(carouselBackgroundColor)
     }
     // endregion
 
     // region public api
-    fun setImages(images: CarouselImageList) {
-        // update page indicators
-        previousSelectedImage = 0
+    fun ofImages(images: CarouselImageList) {
+        previousActiveIndex = 0
+        createIndicators(images.getList().size)
+        adapter.setImages(images)
+        goTo(0)
+    }
+
+    fun ofViews(views: List<View>) {
+        previousActiveIndex = 0
+        createIndicators(views.size)
+        adapter.setViews(views)
+        goTo(0)
+    }
+    // endregion
+
+    // region helper methods
+    private fun createIndicators(count: Int) {
         indicatorContainer.removeAllViews()
-        val imagesCount = images.getList().size
-        if (imagesCount == 1) {
+        if (count == 1) {
             indicatorContainer.visibility = View.GONE
         } else {
             indicatorContainer.visibility = View.VISIBLE
 
-            for (i in 0 until imagesCount) {
-                // add the indicator to the container
-                val indicator = View(context).apply {
-                    background = ContextCompat.getDrawable(context, R.drawable.carousel_item_indicator)!!.apply {
-                        setTint(indicatorCircleColor)
-                    }
-                    layoutParams = LayoutParams(indicatorCircleSize, indicatorCircleSize)
-                        .apply {
-                            setMargins(
-                                if (i == 0) 0 else (indicatorCircleSpacing / 2), 0,
-                                if (i == imagesCount - 1) 0 else (indicatorCircleSpacing / 2), 0)
-                        }
-                }
+            for (i in 0 until count) {
+                // create and add the indicator to the container
+                val indicator = View(context)
+                updateIndicatorAttributes(indicator, i, i == count - 1)
                 indicator.setOnClickListener { goTo(i) }
                 indicatorContainer.addView(indicator)
 
@@ -258,19 +225,50 @@ class ImageCarousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet?
             }
         }
 
-        // Update the adapter
-        imagesAdapter.setImages(images)
-        goTo(0)
+        updateConstraints()
     }
-    // endregion
 
-    // region helper methods
-    private fun goTo(pos: Int) {
-        imageViewPager.post { imageViewPager.setCurrentItem(pos, true) }
+    private fun updateIndicatorAttributes(indicator: View, indicatorPosition: Int, isLast: Boolean = false) {
+        if (indicator.background == null) {
+            indicator.background = ContextCompat.getDrawable(context, R.drawable.carousel_item_indicator)
+        }
+        indicator.background.setTint(indicatorCircleColor)
+        indicator.layoutParams = LayoutParams(indicatorCircleSize, indicatorCircleSize)
+            .apply {
+                setMargins(
+                    if (indicatorPosition == 0) 0 else (indicatorCircleSpacing / 2), 0,
+                    if (isLast) 0 else (indicatorCircleSpacing / 2), 0)
+            }
+    }
+
+    private fun updateConstraints() {
+        ConstraintSet().apply {
+            clone(component)
+
+            if (indicatorContainer.childCount > 0) {
+                if (insetIndicators) {
+                    connect(R.id.carouselPager, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 0)
+                    connect(R.id.indicatorContainer, ConstraintSet.BOTTOM, R.id.carouselPager, ConstraintSet.BOTTOM, offsetIndicatorsBy)
+                    clear(R.id.indicatorContainer, ConstraintSet.TOP)
+                } else {
+                    connect(R.id.carouselPager, ConstraintSet.BOTTOM, R.id.indicatorContainer, ConstraintSet.TOP, 0)
+                    connect(R.id.indicatorContainer, ConstraintSet.TOP, R.id.carouselPager, ConstraintSet.BOTTOM, offsetIndicatorsBy)
+                    connect(R.id.indicatorContainer, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 0)
+                }
+            } else {
+                connect(R.id.carouselPager, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 0)
+            }
+
+            applyTo(component)
+        }
     }
 
     private fun dpToPx(dp: Float): Float {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources.displayMetrics)
+    }
+
+    private fun goTo(pos: Int) {
+        viewPager.post { viewPager.setCurrentItem(pos, true) }
     }
 
     private fun animateIndicator(indicator: View, reverse: Boolean = false, zeroDuration: Boolean = false) {

@@ -1,4 +1,4 @@
-package com.meetarp.imagecarousel
+package com.meetarp.carousel
 
 import org.junit.Test
 
