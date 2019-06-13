@@ -6,7 +6,7 @@
     <application
         android:icon="@mipmap/ic_launcher"
         android:allowBackup="true"
-        android:label="ImageCarousel Test"
+        android:label="Carousel Test"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar">
