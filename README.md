@@ -23,7 +23,7 @@ Has multiple defined attributes that you can specify in your XML layout:
 |-------------|-----------|-------|
 |`app:carouselBackgroundColor`|`@ColorInt` The color that will be applied to the background of the carousel, if visible.|android.R.color.transparent|
 |`app:insetIndicators`|Boolean. Determines whether or not to inset the carousel item indicators.|true|
-|`app:offsetIndicatorsBy`|`@Dimension` Dimension (pixels) to offset the carousel item indicators from the ViewPager.|16dp|
+|`app:offsetIndicatorsBy`|`@Dimension` Dimension (pixels) representing the distance between the bottom of the viewpager and the closest edge of the indicator container (bottom edge if indicators are inset, top edge if outset)|16dp|
 |`app:indicatorColor`|`@ColorInt` Color to tint all carousel item indicators.|android.R.color.white|
 |`app:indicatorSize`|`@Dimension` Dimension (pixels) for the base size of all carousel item indicators.|5dp|
 |`app:indicatorSpacing`|`@Dimension` Dimension (pixels) for the total space in between carousel item indicators.|10dp|
