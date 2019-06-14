@@ -21,13 +21,13 @@ Has multiple defined attributes that you can specify in your XML layout:
 
 |XML Attribute|Description|Default|
 |-------------|-----------|-------|
-|`app:carouselBackgroundColor`|The color that will be applied to the background of the carousel, if visible.|android.R.color.transparent|
+|`app:carouselBackgroundColor`|`@ColorInt` The color that will be applied to the background of the carousel, if visible.|android.R.color.transparent|
 |`app:insetIndicators`|Boolean. Determines whether or not to inset the carousel item indicators.|true|
-|`app:offsetIndicatorsBy`|Dimension (pixels) to offset the carousel item indicators from the ViewPager.|16dp|
-|`app:indicatorCircleColor`|Color to tint all carousel item indicators.|android.R.color.white|
-|`app:indicatorCircleSize`|Dimension (pixels) for the base size of all carousel item indicators.|5dp|
+|`app:offsetIndicatorsBy`|`@Dimension` Dimension (pixels) to offset the carousel item indicators from the ViewPager.|16dp|
+|`app:indicatorCircleColor`|`@ColorInt` Color to tint all carousel item indicators.|android.R.color.white|
+|`app:indicatorCircleSize`|`@Dimension` Dimension (pixels) for the base size of all carousel item indicators.|5dp|
 |`app:indicatorActiveScaleFactor`|Scale factor for the selected state of a carousel item indicator.|1.8|
-|`app:indicatorCircleSpacing`|Dimension (pixels) for the total space in between carousel item indicators.|10dp|
+|`app:indicatorCircleSpacing`|`@Dimension` Dimension (pixels) for the total space in between carousel item indicators.|10dp|
 
 ## Usage
 
@@ -44,7 +44,7 @@ recommended that they be of similar (if not identical) heights.
         android:layout_width="match_parent"
         android:layout_height="200dp"
         app:carouselBackgroundColor="@android:color/transparent"
-        app:insetIndicators="false"
+        app:insetIndicators="true"
         app:offsetIndicatorsBy="16dp"
         app:indicatorCircleColor="@android:color/white"
         app:indicatorCircleSize="5dp"
