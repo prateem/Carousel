@@ -89,7 +89,7 @@ class Carousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? = nu
      * The tint/color to apply to each individual page indicator.
      * Default: [android.R.color.white]
      */
-    @ColorInt var indicatorCircleColor: Int = ContextCompat.getColor(ctx, android.R.color.white)
+    @ColorInt var indicatorColor: Int = ContextCompat.getColor(ctx, android.R.color.white)
         set(value) {
             field = value
             adapter.setErrorTint(value)
@@ -100,7 +100,17 @@ class Carousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? = nu
      * The size of each individual page indicator, in pixels.
      * Default: 5dp.
      */
-    @Dimension(unit = Dimension.PX) var indicatorCircleSize: Int = dpToPx(5f).toInt()
+    @Dimension(unit = Dimension.PX) var indicatorSize: Int = dpToPx(5f).toInt()
+        set(value) {
+            field = value
+            updateAllIndicatorAttributes()
+        }
+
+    /**
+     * The total space in between each individual page indicator, in pixels.
+     * Default: 10dp.
+     */
+    @Dimension var indicatorSpacing: Int = dpToPx(10f).toInt()
         set(value) {
             field = value
             updateAllIndicatorAttributes()
@@ -115,16 +125,6 @@ class Carousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? = nu
             field = value
             updateViewPadding()
         }
-
-    /**
-     * The total space in between each individual page indicator, in pixels.
-     * Default: 10dp.
-     */
-    @Dimension var indicatorCircleSpacing: Int = dpToPx(10f).toInt()
-        set(value) {
-            field = value
-            updateAllIndicatorAttributes()
-        }
     // endregion
 
     // region initialization / lifecycle
@@ -137,10 +137,10 @@ class Carousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? = nu
             insetIndicators = attributes.getBoolean(R.styleable.Carousel_insetIndicators, insetIndicators)
             offsetIndicatorsBy = attributes.getDimensionPixelOffset(R.styleable.Carousel_offsetIndicatorsBy, offsetIndicatorsBy)
 
-            indicatorCircleColor = attributes.getColor(R.styleable.Carousel_indicatorCircleColor, indicatorCircleColor)
-            indicatorCircleSize = attributes.getDimensionPixelSize(R.styleable.Carousel_indicatorCircleSize, indicatorCircleSize)
+            indicatorColor = attributes.getColor(R.styleable.Carousel_indicatorColor, indicatorColor)
+            indicatorSize = attributes.getDimensionPixelSize(R.styleable.Carousel_indicatorSize, indicatorSize)
+            indicatorSpacing = attributes.getDimensionPixelOffset(R.styleable.Carousel_indicatorSpacing, indicatorSpacing)
             indicatorActiveScaleFactor = attributes.getFloat(R.styleable.Carousel_indicatorActiveScaleFactor, indicatorActiveScaleFactor)
-            indicatorCircleSpacing = attributes.getDimensionPixelOffset(R.styleable.Carousel_indicatorCircleSpacing, indicatorCircleSpacing)
             attributes.recycle()
         }
     }
@@ -184,7 +184,7 @@ class Carousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? = nu
 
     private fun updateViewPadding() {
         // This is necessary so that page indicator scaling does not get clipped by the layout bound
-        val bottom = if (!insetIndicators) (indicatorCircleSize * indicatorActiveScaleFactor / 2).toInt() else 0
+        val bottom = if (!insetIndicators) (indicatorSize * indicatorActiveScaleFactor / 2).toInt() else 0
         setPadding(0, 0, 0, bottom)
     }
 
@@ -250,12 +250,12 @@ class Carousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? = nu
         if (indicator.background == null) {
             indicator.background = ContextCompat.getDrawable(context, R.drawable.carousel_item_indicator)
         }
-        indicator.background.setTint(indicatorCircleColor)
-        indicator.layoutParams = LayoutParams(indicatorCircleSize, indicatorCircleSize)
+        indicator.background.setTint(indicatorColor)
+        indicator.layoutParams = LayoutParams(indicatorSize, indicatorSize)
             .apply {
                 setMargins(
-                    if (indicatorPosition == 0) 0 else (indicatorCircleSpacing / 2), 0,
-                    if (isLast) 0 else (indicatorCircleSpacing / 2), 0)
+                    if (indicatorPosition == 0) 0 else (indicatorSpacing / 2), 0,
+                    if (isLast) 0 else (indicatorSpacing / 2), 0)
             }
     }
 

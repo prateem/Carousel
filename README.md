@@ -24,10 +24,10 @@ Has multiple defined attributes that you can specify in your XML layout:
 |`app:carouselBackgroundColor`|`@ColorInt` The color that will be applied to the background of the carousel, if visible.|android.R.color.transparent|
 |`app:insetIndicators`|Boolean. Determines whether or not to inset the carousel item indicators.|true|
 |`app:offsetIndicatorsBy`|`@Dimension` Dimension (pixels) to offset the carousel item indicators from the ViewPager.|16dp|
-|`app:indicatorCircleColor`|`@ColorInt` Color to tint all carousel item indicators.|android.R.color.white|
-|`app:indicatorCircleSize`|`@Dimension` Dimension (pixels) for the base size of all carousel item indicators.|5dp|
+|`app:indicatorColor`|`@ColorInt` Color to tint all carousel item indicators.|android.R.color.white|
+|`app:indicatorSize`|`@Dimension` Dimension (pixels) for the base size of all carousel item indicators.|5dp|
+|`app:indicatorSpacing`|`@Dimension` Dimension (pixels) for the total space in between carousel item indicators.|10dp|
 |`app:indicatorActiveScaleFactor`|Scale factor for the selected state of a carousel item indicator.|1.8|
-|`app:indicatorCircleSpacing`|`@Dimension` Dimension (pixels) for the total space in between carousel item indicators.|10dp|
 
 ## Usage
 
@@ -46,10 +46,10 @@ recommended that they be of similar (if not identical) heights.
         app:carouselBackgroundColor="@android:color/transparent"
         app:insetIndicators="true"
         app:offsetIndicatorsBy="16dp"
-        app:indicatorCircleColor="@android:color/white"
-        app:indicatorCircleSize="5dp"
-        app:indicatorActiveScaleFactor="1.8"
-        app:indicatorCircleSpacing="10dp" />
+        app:indicatorColor="@android:color/white"
+        app:indicatorSize="5dp"
+        app:indicatorSpacing="10dp"
+        app:indicatorActiveScaleFactor="1.8" />
 ```
 
 #### In Activity/Fragment
@@ -78,10 +78,10 @@ carousel.setImageClickListener(object : Carousel.ImageClickListener {
 carousel.carouselBackgroundColor = ContextCompat.getColor(context, R.color.grey)
 carousel.insetIndicators = false
 carousel.offsetIndicatorsBy = dpToPx(20f).toInt()
-carousel.indicatorCircleColor = ContextCompat.getColor(context, R.color.royal_blue)
-carousel.indicatorCircleSize = dpToPx(8f).toInt()
+carousel.indicatorColor = ContextCompat.getColor(context, R.color.royal_blue)
+carousel.indicatorSize = dpToPx(8f).toInt()
+carousel.indicatorSpacing = dpToPx(12f).toInt()
 carousel.indicatorActiveScaleFactor = 1.5f
-carousel.indicatorCircleSpacing = dpToPx(12f).toInt()
 ```
 
 And that's all you need to do.

@@ -9,8 +9,8 @@
             android:id="@+id/carousel_test"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            app:indicatorCircleColor="?android:attr/textColorPrimary"
-            app:indicatorCircleSpacing="20dp"
-            app:indicatorCircleSize="8dp" />
+            app:indicatorColor="?android:attr/textColorPrimary"
+            app:indicatorSpacing="20dp"
+            app:indicatorSize="8dp" />
 
 </LinearLayout>
