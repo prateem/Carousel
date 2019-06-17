@@ -58,48 +58,55 @@ internal class CarouselAdapter(private val context: Context) : RecyclerView.Adap
         holder.error.visibility = View.GONE
 
         if (carouselViews != null) {
-            holder.progressBar.visibility = View.GONE
-            holder.container.removeAllViews()
-            holder.container.addView(carouselViews!![position])
+            bindViewToViewHolder(holder, carouselViews!![position])
         } else {
-            val imageSource = carouselImages!!.getList()[position]
-            val withCallback = object : Callback {
-                override fun onSuccess() {
-                    holder.progressBar.visibility = View.GONE
-                }
+            bindImageToViewHolder(holder, carouselImages!!.getList()[position])
+        }
+    }
 
-                override fun onError(e: Exception?) {
-                    Log.v("Carousel", "Displaying error image due to failure loading desired image: ", e)
-                    holder.container.visibility = View.GONE
-                    holder.progressBar.visibility = View.GONE
-                    holder.error.let {
-                        it.visibility = View.VISIBLE
-                        it.setColorFilter(errorTint)
-                    }
-                }
+    private fun bindViewToViewHolder(holder: CarouselViewHolder, view: View) {
+        holder.progressBar.visibility = View.GONE
+        holder.container.removeAllViews()
+        holder.container.addView(view)
+    }
+
+    private fun bindImageToViewHolder(holder: CarouselViewHolder, imageSource: Any) {
+        val withCallback = object : Callback {
+            override fun onSuccess() {
+                holder.progressBar.visibility = View.GONE
             }
 
-            val imageView: ImageView
-            if (holder.container.childCount > 0 && holder.container.getChildAt(0) is ImageView) {
-                imageView = holder.container.getChildAt(0) as ImageView
+            override fun onError(e: Exception?) {
+                Log.v("Carousel", "Displaying error image due to failure loading desired image: ", e)
+                holder.container.visibility = View.GONE
+                holder.progressBar.visibility = View.GONE
+                holder.error.let {
+                    it.visibility = View.VISIBLE
+                    it.setColorFilter(errorTint)
+                }
+            }
+        }
+
+        val imageView: ImageView
+        if (holder.container.childCount > 0 && holder.container.getChildAt(0) is ImageView) {
+            imageView = holder.container.getChildAt(0) as ImageView
+        } else {
+            imageView = ImageView(context)
+            holder.container.removeAllViews()
+            holder.container.addView(imageView)
+        }
+
+        Picasso.get().let {
+            if (imageSource is Int) {
+                it.load(imageSource).into(imageView, withCallback)
             } else {
-                imageView = ImageView(context)
-                holder.container.removeAllViews()
-                holder.container.addView(imageView)
+                it.load(imageSource as Uri).into(imageView, withCallback)
             }
+        }
 
-            Picasso.get().let {
-                if (imageSource is Int) {
-                    it.load(imageSource).into(imageView, withCallback)
-                } else {
-                    it.load(imageSource as Uri).into(imageView, withCallback)
-                }
-            }
-
-            imageView.setOnClickListener(null)
-            if (imageClickListener != null) {
-                imageView.setOnClickListener { imageClickListener?.onImageClicked(holder.adapterPosition) }
-            }
+        imageView.setOnClickListener(null)
+        if (imageClickListener != null) {
+            imageView.setOnClickListener { imageClickListener?.onImageClicked(holder.adapterPosition) }
         }
     }
 
