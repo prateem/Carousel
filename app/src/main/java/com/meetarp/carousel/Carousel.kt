@@ -41,6 +41,10 @@ class Carousel<ItemType> @JvmOverloads constructor(
         fun onItemClicked(view: View, position: Int)
     }
 
+    interface PageChangeListener {
+        fun onPageSelected(position: Int)
+    }
+
     // region Layout elements
     private val component: ConstraintLayout = LayoutInflater.from(context)
         .inflate(R.layout.carousel, this, false) as ConstraintLayout
@@ -139,6 +143,15 @@ class Carousel<ItemType> @JvmOverloads constructor(
             field = value
             updateViewPadding()
         }
+
+    /**
+     * A page change listener to respond to paging events.
+     */
+    var pageChangeListener: PageChangeListener? = null
+        set(value) {
+            field = value
+            pageChangeListener?.onPageSelected(previousActiveIndex)
+        }
     // endregion
 
     // region initialization / lifecycle
@@ -170,6 +183,7 @@ class Carousel<ItemType> @JvmOverloads constructor(
                     animateIndicator(indicatorContainer.getChildAt(position))
                     previousActiveIndex = position
                 }
+                pageChangeListener?.onPageSelected(position)
             }
         })
 

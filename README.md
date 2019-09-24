@@ -68,12 +68,19 @@ imagesAdapter.setItems(images)
 // Attach a click listener, if you want.
 imagesAdapter.setItemClickListener(object : Carousel.ItemClickListener {
     override fun onItemClicked(view: View, position: Int) {
-        // .. do something
+        // ... do something
     }
 })
 
 // Give the carousel the adapter
 imageResCarousel.adapter = imagesAdapter
+
+// Listen for page changes if you're interested in that information
+imageResCarousel.pageChangeListener = object : Carousel.PageChangeListener {
+    override fun onPageSelected(position: Int) {
+        // ... do something
+    }
+}
 
 // All of the xml attributes can also be set through code using identically named accessors
 carousel.carouselBackgroundColor = ContextCompat.getColor(context, R.color.grey)
