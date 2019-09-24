@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="Carousel">
-        <attr name="carouselBackgroundColor" format="color" />
-        <attr name="insetIndicators" format="boolean" />
-        <attr name="offsetIndicatorsBy" format="dimension" />
-        <attr name="indicatorColor" format="color" />
-        <attr name="indicatorSize" format="dimension" />
-        <attr name="indicatorSpacing" format="dimension" />
-        <attr name="indicatorActiveScaleFactor" format="float" />
+        <attr name="carousel_backgroundColor" format="color" />
+        <attr name="carousel_insetIndicators" format="boolean" />
+        <attr name="carousel_offsetIndicatorsBy" format="dimension" />
+        <attr name="carousel_indicatorColor" format="color" />
+        <attr name="carousel_indicatorSize" format="dimension" />
+        <attr name="carousel_indicatorSpacing" format="dimension" />
+        <attr name="carousel_indicatorActiveScaleFactor" format="float" />
     </declare-styleable>
 </resources>

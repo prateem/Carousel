@@ -1,18 +1,16 @@
 # Carousel for Android
-An carousel for Android applications with built-in page indicators.
+A carousel for Android applications with built-in page indicators.
 
-Implemented as a custom view that renders carousel leveraging ViewPager2, displaying either
-images or passed-in views.
+Implemented as a custom view that renders a carousel leveraging ViewPager2, with an
+extensible Adapter system that allows you to build the carousel you want.
 
-Image sources can be drawable resource ids or
-[Uri](https://developer.android.com/reference/android/net/Uri#parse(java.lang.String))
-objects. They can be loaded from populating a `CarouselImageList` either manually or through
-one of the two builder methods: `CarouselImageList.fromDrawableResList` and `CarouselImageList.fromUriList`.
-Once a populated image list is available, call `Carousel.ofImages` on a reference to the Carousel.
+Comes with two built-in adapters to quick-start
 
-Views can be loaded into the carousel by passing a
-[List](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html) of
-[View](https://developer.android.com/reference/android/view/View) objects to `Carousel.ofViews`.
+* `CarouselImagesAdapter` for drawables or image resources from within the app
+* `CarouselViewsAdapter` for a simple, generic View adapter.
+
+Simply instantiate the Carousel in your activity or fragment, create the adapter, and attach it.
+Everything else is handled for you.
 
 Currently active item indicators are also automatically created and kept in sync
 with the carousel's ViewPager.
@@ -21,13 +19,13 @@ Has multiple defined attributes that you can specify in your XML layout:
 
 |XML Attribute|Description|Default|
 |-------------|-----------|-------|
-|`app:carouselBackgroundColor`|`@ColorInt` The color that will be applied to the background of the carousel, if visible.|android.R.color.transparent|
-|`app:insetIndicators`|Boolean. Determines whether or not to inset the carousel item indicators.|true|
-|`app:offsetIndicatorsBy`|`@Dimension` Dimension (pixels) representing the distance between the bottom of the viewpager and the closest edge of the indicator container (bottom edge if indicators are inset, top edge if outset)|16dp|
-|`app:indicatorColor`|`@ColorInt` Color to tint all carousel item indicators.|android.R.color.white|
-|`app:indicatorSize`|`@Dimension` Dimension (pixels) for the base size of all carousel item indicators.|5dp|
-|`app:indicatorSpacing`|`@Dimension` Dimension (pixels) for the total space in between carousel item indicators.|10dp|
-|`app:indicatorActiveScaleFactor`|Scale factor for the selected state of a carousel item indicator.|1.8|
+|`app:carousel_backgroundColor`|`@ColorInt` The color that will be applied to the background of the carousel, if visible.|android.R.color.transparent|
+|`app:carousel_insetIndicators`|Boolean. Determines whether or not to inset the carousel item indicators.|true|
+|`app:carousel_offsetIndicatorsBy`|`@Dimension` Dimension (pixels) representing the distance between the bottom of the viewpager and the closest edge of the indicator container (bottom edge if indicators are inset, top edge if outset)|16dp|
+|`app:carousel_indicatorColor`|`@ColorInt` Color to tint all carousel item indicators.|android.R.color.white|
+|`app:carousel_indicatorSize`|`@Dimension` Dimension (pixels) for the base size of all carousel item indicators.|5dp|
+|`app:carousel_indicatorSpacing`|`@Dimension` Dimension (pixels) for the total space in between carousel item indicators.|10dp|
+|`app:carousel_indicatorActiveScaleFactor`|Scale factor for the selected state of a carousel item indicator.|1.8|
 
 ## Usage
 
@@ -43,36 +41,39 @@ recommended that they be of similar (if not identical) heights.
         android:id="@+id/carousel"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        app:carouselBackgroundColor="@android:color/transparent"
-        app:insetIndicators="true"
-        app:offsetIndicatorsBy="16dp"
-        app:indicatorColor="@android:color/white"
-        app:indicatorSize="5dp"
-        app:indicatorSpacing="10dp"
-        app:indicatorActiveScaleFactor="1.8" />
+        app:carousel_backgroundColor="@android:color/transparent"
+        app:carousel_insetIndicators="true"
+        app:carousel_offsetIndicatorsBy="16dp"
+        app:carousel_indicatorColor="@android:color/white"
+        app:carousel_indicatorSize="5dp"
+        app:carousel_indicatorSpacing="10dp"
+        app:carousel_indicatorActiveScaleFactor="1.8" />
 ```
 
 #### In Activity/Fragment
 ```kotlin
 // Capture the reference to the carousel
-val carousel: Carousel = findViewById(R.id.carousel)
+val imageResCarousel: Carousel<Int> = findViewById(R.id.carousel)
 
-// Populate the image list with drawables or Uri objects
-val images = CarouselImageList()
+// Populate the image list with drawables
+val images = mutableListOf<Int>()
 images.add(R.drawable.image1)
-images.add(Uri.parse("https://www.example.com/image2.png"))
+images.add(R.drawable.image2)
 images.add(R.drawable.image3)
 
-// Let the carousel know you're ready
-carousel.ofImages(images)
+// Create the adapter and set the items
+val imagesAdapter = CarouselImagesAdapter(context)
+imagesAdapter.setItems(images)
 
-// Attach a click listener for images, if you want.
-// Any click listener that you want attached to views will have to be set on the views themselves.
-carousel.setImageClickListener(object : Carousel.ImageClickListener {
-    override fun onImageClicked(position: Int) {
+// Attach a click listener, if you want.
+imagesAdapter.setItemClickListener(object : Carousel.ItemClickListener {
+    override fun onItemClicked(view: View, position: Int) {
         // .. do something
     }
 })
+
+// Give the carousel the adapter
+imageResCarousel.adapter = imagesAdapter
 
 // All of the xml attributes can also be set through code using identically named accessors
 carousel.carouselBackgroundColor = ContextCompat.getColor(context, R.color.grey)
@@ -93,3 +94,5 @@ And that's all you need to do.
     Picasso needs to re-load them into a viewholder. This only happens when the carousel
     height is not explicitly defined (i.e. `wrap_contents`) and constituent image heights
     are not equal.
+    
+![Carousel example](carousel.webm)

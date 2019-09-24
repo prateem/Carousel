@@ -6,11 +6,20 @@
               android:layout_height="match_parent">
 
     <com.meetarp.carousel.Carousel
-            android:id="@+id/carousel_test"
+            android:id="@+id/carousel_images_test"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            app:indicatorColor="?android:attr/textColorPrimary"
-            app:indicatorSpacing="20dp"
-            app:indicatorSize="8dp" />
+            app:carousel_indicatorColor="@android:color/holo_orange_light"
+            app:carousel_indicatorSpacing="20dp"
+            app:carousel_indicatorSize="8dp" />
+
+    <com.meetarp.carousel.Carousel
+            android:id="@+id/carousel_view_test"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="80dp"
+            app:carousel_indicatorColor="@android:color/holo_blue_dark"
+            app:carousel_indicatorSpacing="20dp"
+            app:carousel_indicatorSize="8dp" />
 
 </LinearLayout>

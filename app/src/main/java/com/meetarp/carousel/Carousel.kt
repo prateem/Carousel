@@ -4,7 +4,6 @@ import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.content.Context
 import android.content.res.TypedArray
-import android.net.Uri
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -13,44 +12,57 @@ import android.view.animation.Interpolator
 import android.widget.LinearLayout
 import androidx.annotation.ColorInt
 import androidx.annotation.Dimension
-import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
+import kotlin.math.abs
 
 /**
- * Custom view that renders a carousel of either images or views leveraging ViewPager2.
+ * Custom view that renders a carousel of items leveraging ViewPager2.
  *
- * Image sources can be [DrawableRes] or [Uri], and can be loaded from either
- * populating a [CarouselImageList] either manually or through
- * [CarouselImageList.fromDrawableResList] or [CarouselImageList.fromUriList]
- * and calling [Carousel.ofImages].
+ * Can create a custom implementation of [CarouselAdapter] to make the carousel work for
+ * any item content you wish. There are two pre-built implementations for image resources (ints)
+ * and generic views: [CarouselImagesAdapter] and [CarouselViewsAdapter]
  *
- * Views can be loaded into the carousel by passing a [List] of [View] objects to [Carousel.ofViews].
- *
- * Also automatically creates carousel item indicators to denote the current position of the
- * carousel's ViewPager.
+ * Also automatically creates item indicators to denote the current position of the ViewPager.
  *
  * @author Prateem Shrestha (prateems@gmail.com)
  */
 @Suppress("MemberVisibilityCanBePrivate", "Unused")
-class Carousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0, defStyleRes: Int = 0) :
-    LinearLayout(ctx, attrs, defStyleAttr, defStyleRes) {
+class Carousel<ItemType> @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
+    defStyleRes: Int = 0
+) : LinearLayout(context, attrs, defStyleAttr, defStyleRes) {
 
-    interface ImageClickListener {
-        fun onImageClicked(position: Int)
+    interface ItemClickListener {
+        fun onItemClicked(view: View, position: Int)
     }
 
     // region Layout elements
-    private val component: ConstraintLayout = LayoutInflater.from(ctx).inflate(R.layout.carousel, this, false) as ConstraintLayout
+    private val component: ConstraintLayout = LayoutInflater.from(context)
+        .inflate(R.layout.carousel, this, false) as ConstraintLayout
     private val viewPager: ViewPager2 = component.findViewById(R.id.carouselPager)
     private val indicatorContainer: LinearLayout = component.findViewById(R.id.indicatorContainer)
     // endregion
 
-    // region view pager and page indicator logic related
-    private val adapter: CarouselAdapter = CarouselAdapter(ctx)
-    private var previousActiveIndex = -1
+    // region view pager and page logic related
+    var adapter: CarouselAdapter<ItemType>? = null
+        set(value) {
+            field = value
+            viewPager.adapter = adapter
+            adapter?.let { adapter ->
+                adapter.errorTint = indicatorColor
+                post {
+                    createIndicators(adapter.itemCount)
+                    updateViewPadding()
+                }
+            }
+        }
+
+    private var previousActiveIndex = 0
     // endregion
 
     // region attributes
@@ -58,7 +70,8 @@ class Carousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? = nu
      * The color that will be applied to the background of the carousel, if visible.
      * Default: [android.R.color.transparent]
      */
-    @ColorInt var carouselBackgroundColor: Int = ContextCompat.getColor(ctx, android.R.color.transparent)
+    @ColorInt var carouselBackgroundColor: Int
+            = ContextCompat.getColor(context, android.R.color.transparent)
         set(value) {
             field = value
             updateViewPagerBackground()
@@ -89,10 +102,11 @@ class Carousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? = nu
      * The tint/color to apply to each individual page indicator.
      * Default: [android.R.color.white]
      */
-    @ColorInt var indicatorColor: Int = ContextCompat.getColor(ctx, android.R.color.white)
+    @ColorInt var indicatorColor: Int
+            = ContextCompat.getColor(context, android.R.color.white)
         set(value) {
             field = value
-            adapter.setErrorTint(value)
+            adapter?.errorTint = value
             updateAllIndicatorAttributes()
         }
 
@@ -132,31 +146,27 @@ class Carousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? = nu
         // If attributes were supplied in the XML, utilize them as a first-measure, falling back to defaults
         // as defined above. Programmatically setting these attributes will predictably override these values
         attrs?.let {
-            val attributes: TypedArray = ctx.obtainStyledAttributes(attrs, R.styleable.Carousel)
-            carouselBackgroundColor = attributes.getColor(R.styleable.Carousel_carouselBackgroundColor, carouselBackgroundColor)
-            insetIndicators = attributes.getBoolean(R.styleable.Carousel_insetIndicators, insetIndicators)
-            offsetIndicatorsBy = attributes.getDimensionPixelOffset(R.styleable.Carousel_offsetIndicatorsBy, offsetIndicatorsBy)
+            val attributes: TypedArray = context.obtainStyledAttributes(attrs, R.styleable.Carousel)
+            carouselBackgroundColor = attributes.getColor(R.styleable.Carousel_carousel_backgroundColor, carouselBackgroundColor)
+            insetIndicators = attributes.getBoolean(R.styleable.Carousel_carousel_insetIndicators, insetIndicators)
+            offsetIndicatorsBy = attributes.getDimensionPixelOffset(R.styleable.Carousel_carousel_offsetIndicatorsBy, offsetIndicatorsBy)
 
-            indicatorColor = attributes.getColor(R.styleable.Carousel_indicatorColor, indicatorColor)
-            indicatorSize = attributes.getDimensionPixelSize(R.styleable.Carousel_indicatorSize, indicatorSize)
-            indicatorSpacing = attributes.getDimensionPixelOffset(R.styleable.Carousel_indicatorSpacing, indicatorSpacing)
-            indicatorActiveScaleFactor = attributes.getFloat(R.styleable.Carousel_indicatorActiveScaleFactor, indicatorActiveScaleFactor)
+            indicatorColor = attributes.getColor(R.styleable.Carousel_carousel_indicatorColor, indicatorColor)
+            indicatorSize = attributes.getDimensionPixelSize(R.styleable.Carousel_carousel_indicatorSize, indicatorSize)
+            indicatorSpacing = attributes.getDimensionPixelOffset(R.styleable.Carousel_carousel_indicatorSpacing, indicatorSpacing)
+            indicatorActiveScaleFactor = attributes.getFloat(R.styleable.Carousel_carousel_indicatorActiveScaleFactor, indicatorActiveScaleFactor)
             attributes.recycle()
         }
     }
 
     override fun onFinishInflate() {
         super.onFinishInflate()
-        // Set up the adapter
-        viewPager.adapter = adapter
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 // Can get onPageSelected called when only 1 image is available
                 // In that case, no indicators are added, so prevent a NPE when calling getChildAt()
                 if (indicatorContainer.childCount > 0) {
-                    if (previousActiveIndex != -1) {
-                        animateIndicator(indicatorContainer.getChildAt(previousActiveIndex), reverse = true)
-                    }
+                    animateIndicator(indicatorContainer.getChildAt(previousActiveIndex), reverse = true)
                     animateIndicator(indicatorContainer.getChildAt(position))
                     previousActiveIndex = position
                 }
@@ -178,48 +188,24 @@ class Carousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? = nu
     // region attribute change helpers
     private fun updateAllIndicatorAttributes() {
         for (i in 0 until indicatorContainer.childCount) {
-            updateIndicatorAttributes(indicatorContainer.getChildAt(i), i, i == indicatorContainer.childCount - 1)
+            updateIndicatorAttributes(
+                indicatorContainer.getChildAt(i), i,
+                i == indicatorContainer.childCount - 1
+            )
         }
     }
 
     private fun updateViewPadding() {
         // This is necessary so that page indicator scaling does not get clipped by the layout bound
-        val bottom = if (!insetIndicators) (indicatorSize * indicatorActiveScaleFactor / 2).toInt() else 0
+        val bottom =
+            if (!insetIndicators)
+                (indicatorSize * indicatorActiveScaleFactor / 2).toInt()
+            else 0
         setPadding(0, 0, 0, bottom)
     }
 
     private fun updateViewPagerBackground() {
         viewPager.setBackgroundColor(carouselBackgroundColor)
-    }
-    // endregion
-
-    // region public api
-    /**
-     * Display the images from the given list in the carousel.
-     */
-    fun ofImages(images: CarouselImageList) {
-        previousActiveIndex = 0
-        createIndicators(images.getList().size)
-        adapter.setImages(images)
-        goTo(0)
-    }
-
-    /**
-     * Display the views from the given list in the carousel.
-     */
-    fun ofViews(views: List<View>) {
-        previousActiveIndex = 0
-        createIndicators(views.size)
-        adapter.setViews(views)
-        goTo(0)
-    }
-
-    /**
-     * Attach a click listener for clicks on images.
-     * Does not do anything if displaying views.
-     */
-    fun setImageClickListener(listener: ImageClickListener?) {
-        adapter.setImageClickListener(listener)
     }
     // endregion
 
@@ -246,7 +232,11 @@ class Carousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? = nu
         updateConstraints()
     }
 
-    private fun updateIndicatorAttributes(indicator: View, indicatorPosition: Int, isLast: Boolean = false) {
+    private fun updateIndicatorAttributes(
+        indicator: View,
+        indicatorPosition: Int,
+        isLast: Boolean = false
+    ) {
         if (indicator.background == null) {
             indicator.background = ContextCompat.getDrawable(context, R.drawable.carousel_item_indicator)
         }
@@ -260,24 +250,48 @@ class Carousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? = nu
     }
 
     private fun updateConstraints() {
-        ConstraintSet().apply {
-            clone(component)
+        ConstraintSet().also { constraints ->
+            constraints.clone(component)
 
             if (indicatorContainer.childCount > 0) {
                 if (insetIndicators) {
-                    connect(R.id.carouselPager, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 0)
-                    connect(R.id.indicatorContainer, ConstraintSet.BOTTOM, R.id.carouselPager, ConstraintSet.BOTTOM, offsetIndicatorsBy)
-                    clear(R.id.indicatorContainer, ConstraintSet.TOP)
+                    constraints.connect(
+                        R.id.carouselPager, ConstraintSet.BOTTOM,
+                        ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM,
+                        0
+                    )
+                    constraints.connect(
+                        R.id.indicatorContainer, ConstraintSet.BOTTOM,
+                        R.id.carouselPager, ConstraintSet.BOTTOM,
+                        offsetIndicatorsBy
+                    )
+                    constraints.clear(R.id.indicatorContainer, ConstraintSet.TOP)
                 } else {
-                    connect(R.id.carouselPager, ConstraintSet.BOTTOM, R.id.indicatorContainer, ConstraintSet.TOP, 0)
-                    connect(R.id.indicatorContainer, ConstraintSet.TOP, R.id.carouselPager, ConstraintSet.BOTTOM, offsetIndicatorsBy)
-                    connect(R.id.indicatorContainer, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 0)
+                    constraints.connect(
+                        R.id.carouselPager, ConstraintSet.BOTTOM,
+                        R.id.indicatorContainer, ConstraintSet.TOP,
+                        0
+                    )
+                    constraints.connect(
+                        R.id.indicatorContainer, ConstraintSet.TOP,
+                        R.id.carouselPager, ConstraintSet.BOTTOM,
+                        offsetIndicatorsBy
+                    )
+                    constraints.connect(
+                        R.id.indicatorContainer, ConstraintSet.BOTTOM,
+                        ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM,
+                        0
+                    )
                 }
             } else {
-                connect(R.id.carouselPager, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 0)
+                constraints.connect(
+                    R.id.carouselPager, ConstraintSet.BOTTOM,
+                    ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM,
+                    0
+                )
             }
 
-            applyTo(component)
+            constraints.applyTo(component)
         }
     }
 
@@ -289,13 +303,23 @@ class Carousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? = nu
         viewPager.post { viewPager.setCurrentItem(pos, true) }
     }
 
-    private fun animateIndicator(indicator: View, reverse: Boolean = false, zeroDuration: Boolean = false) {
-        val animator = ObjectAnimator.ofPropertyValuesHolder(indicator, *getIndicatorAnimationProperties())
-        animator.duration = if (zeroDuration) 0 else context.resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
+    private fun animateIndicator(
+        indicator: View,
+        reverse: Boolean = false,
+        zeroDuration: Boolean = false
+    ) {
+        val animator = ObjectAnimator.ofPropertyValuesHolder(
+            indicator,
+            *getIndicatorAnimationProperties()
+        )
 
-        if (reverse) {
+        animator.duration =
+            if (zeroDuration) 0
+            else context.resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
+
+        if (reverse)
             animator.interpolator = ReverseInterpolator()
-        }
+
         animator.start()
     }
 
@@ -314,7 +338,7 @@ class Carousel @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? = nu
      */
     private inner class ReverseInterpolator : Interpolator {
         override fun getInterpolation(paramFloat: Float): Float {
-            return Math.abs(paramFloat - 1f)
+            return abs(paramFloat - 1f)
         }
     }
     // endregion
