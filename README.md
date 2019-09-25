@@ -7,7 +7,7 @@ extensible Adapter system that allows you to build the carousel you want.
 Comes with two built-in adapters to quick-start
 
 * `CarouselViewsAdapter` for a simple, generic View adapter.
-* `CarouselImagesAdapter` for as an example of a slightly more involved adapter that delegates
+* `CarouselImagesAdapter` as an example of a slightly more involved adapter that delegates
 binding behaviour to the custom object type `CarouselImage` that was created for handling loading
 of either a resource or a `Uri` image.
 
