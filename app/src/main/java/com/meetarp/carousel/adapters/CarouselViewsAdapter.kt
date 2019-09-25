@@ -1,4 +1,4 @@
-package com.meetarp.carousel
+package com.meetarp.carousel.adapters
 
 import android.content.Context
 import android.view.View

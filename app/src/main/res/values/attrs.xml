@@ -4,6 +4,7 @@
         <attr name="carousel_backgroundColor" format="color" />
         <attr name="carousel_insetIndicators" format="boolean" />
         <attr name="carousel_offsetIndicatorsBy" format="dimension" />
+        <attr name="carousel_showIndicators" format="boolean" />
         <attr name="carousel_indicatorColor" format="color" />
         <attr name="carousel_indicatorSize" format="dimension" />
         <attr name="carousel_indicatorSpacing" format="dimension" />

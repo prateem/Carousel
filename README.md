@@ -6,26 +6,30 @@ extensible Adapter system that allows you to build the carousel you want.
 
 Comes with two built-in adapters to quick-start
 
-* `CarouselImagesAdapter` for drawables or image resources from within the app
 * `CarouselViewsAdapter` for a simple, generic View adapter.
+* `CarouselImagesAdapter` for as an example of a slightly more involved adapter that delegates
+binding behaviour to the custom object type `CarouselImage` that was created for handling loading
+of either a resource or a `Uri` image.
 
-Simply instantiate the Carousel in your activity or fragment, create the adapter, and attach it.
-Everything else is handled for you.
+As can be seen, this is a very versatile Carousel - all it needs is some implementation of a
+`CarouselAdapter`. Simply instantiate the Carousel in your activity or fragment, create the adapter,
+and attach it. Everything else is handled for you.
 
 Currently active item indicators are also automatically created and kept in sync
 with the carousel's ViewPager.
 
-Has multiple defined attributes that you can specify in your XML layout:
+Has multiple defined attributes that you can specify in your XML layout or manipulate programmatically:
 
 |XML Attribute|Description|Default|
 |-------------|-----------|-------|
 |`app:carousel_backgroundColor`|`@ColorInt` The color that will be applied to the background of the carousel, if visible.|android.R.color.transparent|
-|`app:carousel_insetIndicators`|Boolean. Determines whether or not to inset the carousel item indicators.|true|
+|`app:carousel_showIndicators`|`Boolean` Determines whether or not to show the indicators at all.|true|
+|`app:carousel_insetIndicators`|`Boolean` Determines whether or not to inset the carousel item indicators.|true|
 |`app:carousel_offsetIndicatorsBy`|`@Dimension` Dimension (pixels) representing the distance between the bottom of the viewpager and the closest edge of the indicator container (bottom edge if indicators are inset, top edge if outset)|16dp|
 |`app:carousel_indicatorColor`|`@ColorInt` Color to tint all carousel item indicators.|android.R.color.white|
 |`app:carousel_indicatorSize`|`@Dimension` Dimension (pixels) for the base size of all carousel item indicators.|5dp|
 |`app:carousel_indicatorSpacing`|`@Dimension` Dimension (pixels) for the total space in between carousel item indicators.|10dp|
-|`app:carousel_indicatorActiveScaleFactor`|Scale factor for the selected state of a carousel item indicator.|1.8|
+|`app:carousel_indicatorActiveScaleFactor`|`Float` Scale factor for the selected state of a carousel item indicator.|1.8|
 
 ## Usage
 
@@ -42,6 +46,7 @@ recommended that they be of similar (if not identical) heights.
         android:layout_width="match_parent"
         android:layout_height="200dp"
         app:carousel_backgroundColor="@android:color/transparent"
+        app:carousel_showIndicators="true"
         app:carousel_insetIndicators="true"
         app:carousel_offsetIndicatorsBy="16dp"
         app:carousel_indicatorColor="@android:color/white"
@@ -53,13 +58,13 @@ recommended that they be of similar (if not identical) heights.
 #### In Activity/Fragment
 ```kotlin
 // Capture the reference to the carousel
-val imageResCarousel: Carousel<Int> = findViewById(R.id.carousel)
+val imageCarousel: Carousel<CarouselImage> = findViewById(R.id.carousel)
 
 // Populate the image list with drawables
-val images = mutableListOf<Int>()
-images.add(R.drawable.image1)
-images.add(R.drawable.image2)
-images.add(R.drawable.image3)
+val images = mutableListOf<CarouselImage>()
+images.add(ResourceImage(R.drawable.image1))
+images.add(UriImage(Uri.parse("https://example.me/image2.jpg")))
+images.add(ResourceImage(R.drawable.image3))
 
 // Create the adapter and set the items
 val imagesAdapter = CarouselImagesAdapter(context)
@@ -84,6 +89,7 @@ imageResCarousel.pageChangeListener = object : Carousel.PageChangeListener {
 
 // All of the xml attributes can also be set through code using identically named accessors
 carousel.carouselBackgroundColor = ContextCompat.getColor(context, R.color.grey)
+carousel.showIndicators = true
 carousel.insetIndicators = false
 carousel.offsetIndicatorsBy = dpToPx(20f).toInt()
 carousel.indicatorColor = ContextCompat.getColor(context, R.color.royal_blue)

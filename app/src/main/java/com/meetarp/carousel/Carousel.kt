@@ -9,6 +9,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.Interpolator
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.annotation.ColorInt
 import androidx.annotation.Dimension
@@ -16,6 +17,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
+import com.meetarp.carousel.adapters.CarouselAdapter
 import kotlin.math.abs
 
 /**
@@ -35,7 +37,7 @@ class Carousel<ItemType> @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0
-) : LinearLayout(context, attrs, defStyleAttr, defStyleRes) {
+) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
 
     interface ItemClickListener {
         fun onItemClicked(view: View, position: Int)
@@ -60,7 +62,7 @@ class Carousel<ItemType> @JvmOverloads constructor(
             adapter?.let { adapter ->
                 adapter.errorTint = indicatorColor
                 post {
-                    createIndicators(adapter.itemCount)
+                    setIndicators()
                     updateViewPadding()
                 }
             }
@@ -79,6 +81,13 @@ class Carousel<ItemType> @JvmOverloads constructor(
         set(value) {
             field = value
             updateViewPagerBackground()
+        }
+
+    var showIndicators: Boolean = true
+        set(value) {
+            field = value
+            setIndicators()
+            updateConstraints()
         }
 
     /**
@@ -164,6 +173,7 @@ class Carousel<ItemType> @JvmOverloads constructor(
             insetIndicators = attributes.getBoolean(R.styleable.Carousel_carousel_insetIndicators, insetIndicators)
             offsetIndicatorsBy = attributes.getDimensionPixelOffset(R.styleable.Carousel_carousel_offsetIndicatorsBy, offsetIndicatorsBy)
 
+            showIndicators = attributes.getBoolean(R.styleable.Carousel_carousel_showIndicators, showIndicators)
             indicatorColor = attributes.getColor(R.styleable.Carousel_carousel_indicatorColor, indicatorColor)
             indicatorSize = attributes.getDimensionPixelSize(R.styleable.Carousel_carousel_indicatorSize, indicatorSize)
             indicatorSpacing = attributes.getDimensionPixelOffset(R.styleable.Carousel_carousel_indicatorSpacing, indicatorSpacing)
@@ -224,23 +234,30 @@ class Carousel<ItemType> @JvmOverloads constructor(
     // endregion
 
     // region helper methods
-    private fun createIndicators(count: Int) {
+    private fun setIndicators() {
         indicatorContainer.removeAllViews()
-        if (count == 1) {
-            indicatorContainer.visibility = View.GONE
-        } else {
-            indicatorContainer.visibility = View.VISIBLE
 
-            for (i in 0 until count) {
-                // create and add the indicator to the container
-                val indicator = View(context)
-                updateIndicatorAttributes(indicator, i, i == count - 1)
-                indicator.setOnClickListener { goTo(i) }
-                indicatorContainer.addView(indicator)
+        if (showIndicators) {
+            adapter?.itemCount?.let { count ->
+                if (count == 1) {
+                    indicatorContainer.visibility = View.GONE
+                } else {
+                    indicatorContainer.visibility = View.VISIBLE
 
-                // Animate the indicator to the correct initial state
-                animateIndicator(indicator, reverse = (i != 0), zeroDuration = true)
+                    for (i in 0 until count) {
+                        // create and add the indicator to the container
+                        val indicator = View(context)
+                        updateIndicatorAttributes(indicator, i, i == count - 1)
+                        indicator.setOnClickListener { goTo(i) }
+                        indicatorContainer.addView(indicator)
+
+                        // Animate the indicator to the correct initial state
+                        animateIndicator(indicator, reverse = (i != 0), zeroDuration = true)
+                    }
+                }
             }
+        } else {
+            indicatorContainer.visibility = View.GONE
         }
 
         updateConstraints()

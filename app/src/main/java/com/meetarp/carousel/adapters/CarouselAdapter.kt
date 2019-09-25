@@ -1,4 +1,4 @@
-package com.meetarp.carousel
+package com.meetarp.carousel.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -10,6 +10,8 @@ import android.widget.RelativeLayout
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.meetarp.carousel.Carousel
+import com.meetarp.carousel.R
 
 abstract class CarouselAdapter<ItemType>(context: Context)
     : RecyclerView.Adapter<CarouselAdapter<ItemType>.CarouselViewHolder>() {
