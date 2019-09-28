@@ -24,7 +24,7 @@ Has multiple defined attributes that you can specify in your XML layout or manip
 |-------------|-----------|-------|
 |`app:carousel_backgroundColor`|`@ColorInt` The color that will be applied to the background of the carousel, if visible.|android.R.color.transparent|
 |`app:carousel_showIndicators`|`Boolean` Determines whether or not to show the indicators at all.|true|
-|`app:carousel_indicatorPosition`|`Enum` One of "top", "bottom", "start" or "end".|bottom|
+|`app:carousel_indicatorPosition`|`Enum` Position of indicators relative to the carousel content(s). One of "top", "bottom", "start" or "end".|bottom|
 |`app:carousel_insetIndicators`|`Boolean` Determines whether or not to inset the carousel item indicators.|true|
 |`app:carousel_indicatorColor`|`@ColorInt` Color to tint all carousel item indicators.|android.R.color.white|
 |`app:carousel_indicatorOffset`|`@Dimension` Dimension (pixels) representing the distance between the bottom of the viewpager and the closest edge of the indicator container (bottom edge if indicators are inset, top edge if outset)|16dp|
