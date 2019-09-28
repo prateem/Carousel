@@ -2,10 +2,16 @@
 <resources>
     <declare-styleable name="Carousel">
         <attr name="carousel_backgroundColor" format="color" />
-        <attr name="carousel_insetIndicators" format="boolean" />
-        <attr name="carousel_offsetIndicatorsBy" format="dimension" />
         <attr name="carousel_showIndicators" format="boolean" />
+        <attr name="carousel_indicatorPosition" format="enum">
+            <enum name="top" value="0" />
+            <enum name="bottom" value="1" />
+            <enum name="start" value="2" />
+            <enum name="end" value="3" />
+        </attr>
+        <attr name="carousel_insetIndicators" format="boolean" />
         <attr name="carousel_indicatorColor" format="color" />
+        <attr name="carousel_indicatorOffset" format="dimension" />
         <attr name="carousel_indicatorSize" format="dimension" />
         <attr name="carousel_indicatorSpacing" format="dimension" />
         <attr name="carousel_indicatorActiveScaleFactor" format="float" />

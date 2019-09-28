@@ -24,12 +24,12 @@ import kotlin.math.abs
  * Custom view that renders a carousel of items leveraging ViewPager2.
  *
  * Can create a custom implementation of [CarouselAdapter] to make the carousel work for
- * any item content you wish. There are two pre-built implementations for image resources (ints)
- * and generic views: [CarouselImagesAdapter] and [CarouselViewsAdapter]
+ * any item content you wish. There are two pre-built implementations for images
+ * and generic views: CarouselImagesAdapter and CarouselViewsAdapter
  *
  * Also automatically creates item indicators to denote the current position of the ViewPager.
  *
- * @author Prateem Shrestha (prateems@gmail.com)
+ * @author Prateem Shrestha (http://www.github.com/prateem)
  */
 @Suppress("MemberVisibilityCanBePrivate", "Unused")
 class Carousel<ItemType> @JvmOverloads constructor(
@@ -39,12 +39,10 @@ class Carousel<ItemType> @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
 
+    enum class IndicatorPosition { TOP, BOTTOM, START, END }
+
     interface ItemClickListener {
         fun onItemClicked(view: View, position: Int)
-    }
-
-    interface PageChangeListener {
-        fun onPageSelected(position: Int)
     }
 
     // region Layout elements
@@ -63,6 +61,8 @@ class Carousel<ItemType> @JvmOverloads constructor(
                 adapter.errorTint = indicatorColor
                 post {
                     setIndicators()
+                    updateOrientation()
+                    updateConstraints()
                     updateViewPadding()
                 }
             }
@@ -83,11 +83,33 @@ class Carousel<ItemType> @JvmOverloads constructor(
             updateViewPagerBackground()
         }
 
+    /**
+     * Whether to show or hide the paging indicators.
+     * Default: true
+     */
     var showIndicators: Boolean = true
         set(value) {
             field = value
             setIndicators()
             updateConstraints()
+        }
+
+    /**
+     * What position to place the indicators relative to the carousel.
+     *
+     * This changes the carousel behaviour as well.
+     * [IndicatorPosition.TOP] and [IndicatorPosition.BOTTOM] will cause horizontal scrolling.
+     * [IndicatorPosition.START] and [IndicatorPosition.END] will cause vertical scrolling.
+     *
+     * Default: [IndicatorPosition.BOTTOM]
+     */
+    var indicatorPosition: IndicatorPosition = IndicatorPosition.BOTTOM
+        set(value) {
+            field = value
+            setIndicators()
+            updateOrientation()
+            updateConstraints()
+            updateViewPadding()
         }
 
     /**
@@ -105,7 +127,7 @@ class Carousel<ItemType> @JvmOverloads constructor(
      * The distance between the bottom edge of the carousel and the indicators, in pixels.
      * Default: 16dp.
      */
-    @Dimension(unit = Dimension.PX) var offsetIndicatorsBy: Int = dpToPx(16f).toInt()
+    @Dimension(unit = Dimension.PX) var indicatorOffset: Int = dpToPx(16f).toInt()
         set(value) {
             field = value
             updateConstraints()
@@ -156,7 +178,7 @@ class Carousel<ItemType> @JvmOverloads constructor(
     /**
      * A page change listener to respond to paging events.
      */
-    var pageChangeListener: PageChangeListener? = null
+    var pageChangeListener: ViewPager2.OnPageChangeCallback? = null
         set(value) {
             field = value
             pageChangeListener?.onPageSelected(previousActiveIndex)
@@ -171,9 +193,13 @@ class Carousel<ItemType> @JvmOverloads constructor(
             val attributes: TypedArray = context.obtainStyledAttributes(attrs, R.styleable.Carousel)
             carouselBackgroundColor = attributes.getColor(R.styleable.Carousel_carousel_backgroundColor, carouselBackgroundColor)
             insetIndicators = attributes.getBoolean(R.styleable.Carousel_carousel_insetIndicators, insetIndicators)
-            offsetIndicatorsBy = attributes.getDimensionPixelOffset(R.styleable.Carousel_carousel_offsetIndicatorsBy, offsetIndicatorsBy)
+            indicatorOffset = attributes.getDimensionPixelOffset(R.styleable.Carousel_carousel_indicatorOffset, indicatorOffset)
 
             showIndicators = attributes.getBoolean(R.styleable.Carousel_carousel_showIndicators, showIndicators)
+            indicatorPosition = IndicatorPosition.values()[
+                    attributes.getInt(R.styleable.Carousel_carousel_indicatorPosition, 1)
+            ]
+
             indicatorColor = attributes.getColor(R.styleable.Carousel_carousel_indicatorColor, indicatorColor)
             indicatorSize = attributes.getDimensionPixelSize(R.styleable.Carousel_carousel_indicatorSize, indicatorSize)
             indicatorSpacing = attributes.getDimensionPixelOffset(R.styleable.Carousel_carousel_indicatorSpacing, indicatorSpacing)
@@ -185,15 +211,27 @@ class Carousel<ItemType> @JvmOverloads constructor(
     override fun onFinishInflate() {
         super.onFinishInflate()
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+                pageChangeListener?.onPageScrolled(position, positionOffset, positionOffsetPixels)
+            }
+
             override fun onPageSelected(position: Int) {
                 // Can get onPageSelected called when only 1 image is available
                 // In that case, no indicators are added, so prevent a NPE when calling getChildAt()
-                if (indicatorContainer.childCount > 0) {
+                if (position != -1 && indicatorContainer.childCount > 0) {
                     animateIndicator(indicatorContainer.getChildAt(previousActiveIndex), reverse = true)
                     animateIndicator(indicatorContainer.getChildAt(position))
                     previousActiveIndex = position
                 }
                 pageChangeListener?.onPageSelected(position)
+            }
+
+            override fun onPageScrollStateChanged(state: Int) {
+                pageChangeListener?.onPageScrollStateChanged(state)
             }
         })
 
@@ -205,6 +243,7 @@ class Carousel<ItemType> @JvmOverloads constructor(
         addView(component)
         updateViewPadding()
         updateViewPagerBackground()
+        updateOrientation()
         updateConstraints()
     }
     // endregion
@@ -221,11 +260,18 @@ class Carousel<ItemType> @JvmOverloads constructor(
 
     private fun updateViewPadding() {
         // This is necessary so that page indicator scaling does not get clipped by the layout bound
-        val bottom =
+        val padding =
             if (!insetIndicators)
                 (indicatorSize * indicatorActiveScaleFactor / 2).toInt()
             else 0
-        setPadding(0, 0, 0, bottom)
+
+        when (indicatorPosition) {
+            IndicatorPosition.TOP -> setPaddingRelative(0, padding, 0, 0)
+            IndicatorPosition.BOTTOM -> setPaddingRelative(0, 0, 0, padding)
+            IndicatorPosition.START -> setPaddingRelative(padding, 0, 0, 0)
+            IndicatorPosition.END -> setPaddingRelative(0, 0, padding, 0)
+        }
+
     }
 
     private fun updateViewPagerBackground() {
@@ -234,6 +280,17 @@ class Carousel<ItemType> @JvmOverloads constructor(
     // endregion
 
     // region helper methods
+    private fun updateOrientation() {
+        indicatorContainer.orientation =
+                if (isHorizontalPaging())
+                    LinearLayout.HORIZONTAL
+                else LinearLayout.VERTICAL
+        viewPager.orientation =
+                if (isHorizontalPaging())
+                    ViewPager2.ORIENTATION_HORIZONTAL
+                else ViewPager2.ORIENTATION_VERTICAL
+    }
+
     private fun setIndicators() {
         indicatorContainer.removeAllViews()
 
@@ -259,8 +316,6 @@ class Carousel<ItemType> @JvmOverloads constructor(
         } else {
             indicatorContainer.visibility = View.GONE
         }
-
-        updateConstraints()
     }
 
     private fun updateIndicatorAttributes(
@@ -273,10 +328,22 @@ class Carousel<ItemType> @JvmOverloads constructor(
         }
         indicator.background.setTint(indicatorColor)
         indicator.layoutParams = LayoutParams(indicatorSize, indicatorSize)
-            .apply {
-                setMargins(
-                    if (indicatorPosition == 0) 0 else (indicatorSpacing / 2), 0,
-                    if (isLast) 0 else (indicatorSpacing / 2), 0)
+            .also { lp ->
+                if (isHorizontalPaging()) {
+                    lp.setMargins(
+                            if (indicatorPosition == 0) 0 else (indicatorSpacing / 2),
+                            0,
+                            if (isLast) 0 else (indicatorSpacing / 2),
+                            0
+                    )
+                } else {
+                    lp.setMargins(
+                            0,
+                            if (indicatorPosition == 0) 0 else (indicatorSpacing / 2),
+                            0,
+                            if (isLast) 0 else (indicatorSpacing / 2)
+                    )
+                }
             }
     }
 
@@ -284,35 +351,165 @@ class Carousel<ItemType> @JvmOverloads constructor(
         ConstraintSet().also { constraints ->
             constraints.clone(component)
 
+            // Go back to a 'reset' state on the actual ViewPager.
+            constraints.connect(
+                    R.id.carouselPager, ConstraintSet.START,
+                    ConstraintSet.PARENT_ID, ConstraintSet.START,
+                    0
+            )
+            constraints.connect(
+                    R.id.carouselPager, ConstraintSet.END,
+                    ConstraintSet.PARENT_ID, ConstraintSet.END,
+                    0
+            )
+            constraints.connect(
+                    R.id.carouselPager, ConstraintSet.TOP,
+                    ConstraintSet.PARENT_ID, ConstraintSet.TOP,
+                    0
+            )
+            constraints.connect(
+                    R.id.carouselPager, ConstraintSet.BOTTOM,
+                    ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM,
+                    0
+            )
+
+            // Set up the indicator container for edges that are defined by scroll direction
+            if (isHorizontalPaging()) {
+                constraints.connect(
+                        R.id.indicatorContainer, ConstraintSet.START,
+                        ConstraintSet.PARENT_ID, ConstraintSet.START,
+                        0
+                )
+                constraints.connect(
+                        R.id.indicatorContainer, ConstraintSet.END,
+                        ConstraintSet.PARENT_ID, ConstraintSet.END,
+                        0
+                )
+                constraints.constrainWidth(R.id.indicatorContainer, ConstraintSet.MATCH_CONSTRAINT)
+                constraints.constrainHeight(R.id.indicatorContainer, ConstraintSet.WRAP_CONTENT)
+            } else {
+                constraints.connect(
+                        R.id.indicatorContainer, ConstraintSet.TOP,
+                        ConstraintSet.PARENT_ID, ConstraintSet.TOP,
+                        0
+                )
+                constraints.connect(
+                        R.id.indicatorContainer, ConstraintSet.BOTTOM,
+                        ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM,
+                        0
+                )
+                constraints.constrainWidth(R.id.indicatorContainer, ConstraintSet.WRAP_CONTENT)
+                constraints.constrainHeight(R.id.indicatorContainer, ConstraintSet.MATCH_CONSTRAINT)
+            }
+
             if (indicatorContainer.childCount > 0) {
-                if (insetIndicators) {
-                    constraints.connect(
-                        R.id.carouselPager, ConstraintSet.BOTTOM,
-                        ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM,
-                        0
-                    )
-                    constraints.connect(
-                        R.id.indicatorContainer, ConstraintSet.BOTTOM,
-                        R.id.carouselPager, ConstraintSet.BOTTOM,
-                        offsetIndicatorsBy
-                    )
-                    constraints.clear(R.id.indicatorContainer, ConstraintSet.TOP)
-                } else {
-                    constraints.connect(
-                        R.id.carouselPager, ConstraintSet.BOTTOM,
-                        R.id.indicatorContainer, ConstraintSet.TOP,
-                        0
-                    )
-                    constraints.connect(
-                        R.id.indicatorContainer, ConstraintSet.TOP,
-                        R.id.carouselPager, ConstraintSet.BOTTOM,
-                        offsetIndicatorsBy
-                    )
-                    constraints.connect(
-                        R.id.indicatorContainer, ConstraintSet.BOTTOM,
-                        ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM,
-                        0
-                    )
+                when (indicatorPosition) {
+                    IndicatorPosition.START -> {
+                        if (insetIndicators) {
+                            constraints.connect(
+                                    R.id.indicatorContainer, ConstraintSet.START,
+                                    ConstraintSet.PARENT_ID, ConstraintSet.START,
+                                    indicatorOffset
+                            )
+                            constraints.clear(R.id.indicatorContainer, ConstraintSet.END)
+                        } else {
+                            constraints.connect(
+                                    R.id.indicatorContainer, ConstraintSet.START,
+                                    ConstraintSet.PARENT_ID, ConstraintSet.START,
+                                    0
+                            )
+                            constraints.connect(
+                                    R.id.carouselPager, ConstraintSet.START,
+                                    R.id.indicatorContainer, ConstraintSet.END,
+                                    0
+                            )
+                            constraints.connect(
+                                    R.id.indicatorContainer, ConstraintSet.END,
+                                    R.id.carouselPager, ConstraintSet.START,
+                                    indicatorOffset
+                            )
+                        }
+                    }
+                    IndicatorPosition.END -> {
+                        if (insetIndicators) {
+                            constraints.connect(
+                                    R.id.indicatorContainer, ConstraintSet.END,
+                                    ConstraintSet.PARENT_ID, ConstraintSet.END,
+                                    indicatorOffset
+                            )
+                            constraints.clear(R.id.indicatorContainer, ConstraintSet.START)
+                        } else {
+                            constraints.connect(
+                                    R.id.indicatorContainer, ConstraintSet.END,
+                                    ConstraintSet.PARENT_ID, ConstraintSet.END,
+                                    0
+                            )
+                            constraints.connect(
+                                    R.id.carouselPager, ConstraintSet.END,
+                                    R.id.indicatorContainer, ConstraintSet.START,
+                                    0
+                            )
+                            constraints.connect(
+                                    R.id.indicatorContainer, ConstraintSet.START,
+                                    R.id.carouselPager, ConstraintSet.END,
+                                    indicatorOffset
+                            )
+                        }
+                    }
+                    IndicatorPosition.TOP -> {
+                        if (insetIndicators) {
+                            constraints.connect(
+                                    R.id.indicatorContainer, ConstraintSet.TOP,
+                                    ConstraintSet.PARENT_ID, ConstraintSet.TOP,
+                                    indicatorOffset
+                            )
+                            constraints.clear(R.id.indicatorContainer, ConstraintSet.BOTTOM)
+                        } else {
+                            constraints.connect(
+                                    R.id.indicatorContainer, ConstraintSet.TOP,
+                                    ConstraintSet.PARENT_ID, ConstraintSet.TOP,
+                                    0
+                            )
+                            constraints.connect(
+                                    R.id.carouselPager, ConstraintSet.TOP,
+                                    R.id.indicatorContainer, ConstraintSet.BOTTOM,
+                                    0
+                            )
+                            constraints.connect(
+                                    R.id.indicatorContainer, ConstraintSet.BOTTOM,
+                                    R.id.carouselPager, ConstraintSet.TOP,
+                                    indicatorOffset
+                            )
+                        }
+                    }
+                    else -> {
+                        // default case
+                        assert(indicatorPosition == IndicatorPosition.BOTTOM)
+                        if (insetIndicators) {
+                            constraints.connect(
+                                    R.id.indicatorContainer, ConstraintSet.BOTTOM,
+                                    ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM,
+                                    indicatorOffset
+                            )
+                            constraints.clear(R.id.indicatorContainer, ConstraintSet.TOP)
+                        } else {
+                            constraints.connect(
+                                    R.id.indicatorContainer, ConstraintSet.BOTTOM,
+                                    ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM,
+                                    0
+                            )
+                            constraints.connect(
+                                    R.id.carouselPager, ConstraintSet.BOTTOM,
+                                    R.id.indicatorContainer, ConstraintSet.TOP,
+                                    0
+                            )
+                            constraints.connect(
+                                    R.id.indicatorContainer, ConstraintSet.TOP,
+                                    R.id.carouselPager, ConstraintSet.BOTTOM,
+                                    indicatorOffset
+                            )
+                        }
+                    }
                 }
             } else {
                 constraints.connect(
@@ -321,9 +518,7 @@ class Carousel<ItemType> @JvmOverloads constructor(
                     0
                 )
             }
-
-            constraints.applyTo(component)
-        }
+        }.applyTo(component)
     }
 
     private fun dpToPx(dp: Float): Float {
@@ -360,6 +555,10 @@ class Carousel<ItemType> @JvmOverloads constructor(
             PropertyValuesHolder.ofFloat("scaleX", 1.0f, indicatorActiveScaleFactor),
             PropertyValuesHolder.ofFloat("scaleY", 1.0f, indicatorActiveScaleFactor)
         )
+    }
+
+    private fun isHorizontalPaging(): Boolean {
+        return indicatorPosition in listOf(IndicatorPosition.TOP, IndicatorPosition.BOTTOM)
     }
     // endregion
 

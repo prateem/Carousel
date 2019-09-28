@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupImagesCarousel() {
         val imagesCarousel = findViewById<Carousel<CarouselImage>>(R.id.carousel_images_test)
-        imagesCarousel.insetIndicators = false
+        imagesCarousel.insetIndicators = true
 
         // Photos from Unsplash by:
         //     Joanna Kosinska
@@ -56,6 +56,7 @@ class MainActivity : AppCompatActivity() {
     private fun setupViewsCarousel() {
         val viewsCarousel = findViewById<Carousel<View>>(R.id.carousel_view_test)
         viewsCarousel.insetIndicators = false
+        viewsCarousel.indicatorPosition = Carousel.IndicatorPosition.BOTTOM
 
         val views = mutableListOf<View>()
         views.add(ImageView(this).also { it.setImageResource(R.drawable.puppy_jairo_alzate_unsplash) })
@@ -74,4 +75,5 @@ class MainActivity : AppCompatActivity() {
         adapter.setItems(views)
         viewsCarousel.adapter = adapter
     }
+
 }

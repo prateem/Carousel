@@ -4,10 +4,9 @@ import android.net.Uri
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
+import coil.api.load
+import coil.size.PixelSize
 import com.meetarp.carousel.adapters.CarouselAdapter
-import com.squareup.picasso.Callback
-import com.squareup.picasso.Picasso
-import java.lang.Exception
 
 class UriImage(private val uri: Uri) : CarouselImage() {
 
@@ -16,29 +15,26 @@ class UriImage(private val uri: Uri) : CarouselImage() {
         adapter: CarouselAdapter<CarouselImage>,
         viewHolder: CarouselAdapter<CarouselImage>.CarouselViewHolder
     ) {
-        val withCallback = object : Callback {
-            override fun onSuccess() {
-                viewHolder.progressBar.visibility = View.GONE
-            }
-
-            override fun onError(e: Exception?) {
-                Log.v("Carousel", "Displaying error image due to failure loading desired image: ", e)
-                viewHolder.container.visibility = View.GONE
-                viewHolder.progressBar.visibility = View.GONE
-                viewHolder.error.let {
-                    it.visibility = View.VISIBLE
-                    it.setColorFilter(adapter.errorTint)
-                }
-            }
-        }
-
         viewHolder.container.post {
-            Picasso.get()
-                .load(uri)
-                .resize(viewHolder.container.width, viewHolder.container.height)
-                .onlyScaleDown()
-                .centerInside()
-                .into(imageView, withCallback)
+            imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
+            imageView.load(uri) {
+                size(PixelSize(viewHolder.container.width, viewHolder.container.height))
+                target(
+                    onError = { _ ->
+                        Log.w("Carousel", "Displaying error image due to a failure loading desired image")
+                        viewHolder.container.visibility = View.GONE
+                        viewHolder.progressBar.visibility = View.GONE
+                        viewHolder.error.let {
+                            it.visibility = View.VISIBLE
+                            it.setColorFilter(adapter.errorTint)
+                        }
+                    },
+                    onSuccess = { image ->
+                        viewHolder.progressBar.visibility = View.GONE
+                        imageView.setImageDrawable(image)
+                    }
+                )
+            }
         }
     }
 

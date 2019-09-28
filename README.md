@@ -24,14 +24,18 @@ Has multiple defined attributes that you can specify in your XML layout or manip
 |-------------|-----------|-------|
 |`app:carousel_backgroundColor`|`@ColorInt` The color that will be applied to the background of the carousel, if visible.|android.R.color.transparent|
 |`app:carousel_showIndicators`|`Boolean` Determines whether or not to show the indicators at all.|true|
+|`app:carousel_indicatorPosition`|`Enum` One of "top", "bottom", "start" or "end".|bottom|
 |`app:carousel_insetIndicators`|`Boolean` Determines whether or not to inset the carousel item indicators.|true|
-|`app:carousel_offsetIndicatorsBy`|`@Dimension` Dimension (pixels) representing the distance between the bottom of the viewpager and the closest edge of the indicator container (bottom edge if indicators are inset, top edge if outset)|16dp|
 |`app:carousel_indicatorColor`|`@ColorInt` Color to tint all carousel item indicators.|android.R.color.white|
+|`app:carousel_indicatorOffset`|`@Dimension` Dimension (pixels) representing the distance between the bottom of the viewpager and the closest edge of the indicator container (bottom edge if indicators are inset, top edge if outset)|16dp|
 |`app:carousel_indicatorSize`|`@Dimension` Dimension (pixels) for the base size of all carousel item indicators.|5dp|
 |`app:carousel_indicatorSpacing`|`@Dimension` Dimension (pixels) for the total space in between carousel item indicators.|10dp|
 |`app:carousel_indicatorActiveScaleFactor`|`Float` Scale factor for the selected state of a carousel item indicator.|1.8|
 
 ## Usage
+
+****NOTE:** `app:carousel_indicatorPosition` will affect the scrolling behaviour of the ViewPager!
+Start and end  positions will cause vertical scrolling while top and bottom positions cause horizontal scrolling.
 
 **Note**: It is _highly_ recommended that you constrain the height of the Carousel so
 that the viewpager does not resize itself when loading items of drastically different sizes.
@@ -47,9 +51,10 @@ recommended that they be of similar (if not identical) heights.
         android:layout_height="200dp"
         app:carousel_backgroundColor="@android:color/transparent"
         app:carousel_showIndicators="true"
+        app:carousel_indicatorPosition="bottom"
         app:carousel_insetIndicators="true"
-        app:carousel_offsetIndicatorsBy="16dp"
         app:carousel_indicatorColor="@android:color/white"
+        app:carousel_indicatorOffset="16dp"
         app:carousel_indicatorSize="5dp"
         app:carousel_indicatorSpacing="10dp"
         app:carousel_indicatorActiveScaleFactor="1.8" />
@@ -90,8 +95,9 @@ imageResCarousel.pageChangeListener = object : Carousel.PageChangeListener {
 // All of the xml attributes can also be set through code using identically named accessors
 carousel.carouselBackgroundColor = ContextCompat.getColor(context, R.color.grey)
 carousel.showIndicators = true
+carousel.indicatorPosition = Carousel.IndicatorPosition.START
 carousel.insetIndicators = false
-carousel.offsetIndicatorsBy = dpToPx(20f).toInt()
+carousel.indicatorOffset = dpToPx(20f).toInt()
 carousel.indicatorColor = ContextCompat.getColor(context, R.color.royal_blue)
 carousel.indicatorSize = dpToPx(8f).toInt()
 carousel.indicatorSpacing = dpToPx(12f).toInt()
@@ -100,12 +106,4 @@ carousel.indicatorActiveScaleFactor = 1.5f
 
 And that's all you need to do.
 
-## Known Bugs
-* Vector Drawables do not work, since Picasso does not load vector drawables
-    into ImageViews outside of placeholder or error states.
-* Images that are drastically different in size can cause the Carousel to resize when
-    Picasso needs to re-load them into a viewholder. This only happens when the carousel
-    height is not explicitly defined (i.e. `wrap_contents`) and constituent image heights
-    are not equal.
-    
 ![Carousel example](carousel.webm)
