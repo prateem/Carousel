@@ -4,7 +4,7 @@ A carousel for Android applications with built-in page indicators.
 Implemented as a custom view that renders a carousel leveraging ViewPager2, with an
 extensible Adapter system that allows you to build the carousel you want.
 
-Comes with two built-in adapters to quick-start
+Comes with two built-in adapters to quick-start, both of which are marked as `open`:
 
 * `CarouselViewsAdapter` for a simple, generic View adapter.
 * `CarouselImagesAdapter` as an example of a slightly more involved adapter that delegates
