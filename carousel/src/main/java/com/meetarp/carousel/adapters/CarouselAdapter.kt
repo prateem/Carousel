@@ -1,0 +1,73 @@
+package com.meetarp.carousel.adapters
+
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.RelativeLayout
+import androidx.recyclerview.widget.RecyclerView
+import com.meetarp.carousel.Carousel
+import com.meetarp.carousel.R
+
+abstract class CarouselAdapter<ItemType>
+    : RecyclerView.Adapter<CarouselAdapter<ItemType>.CarouselViewHolder>() {
+
+    protected var carouselItems: List<ItemType> = listOf()
+    private var itemClickListener: Carousel.ItemClickListener? = null
+
+    open fun handleDataChange(
+        oldData: List<ItemType>,
+        newData: List<ItemType>
+    ): Boolean = false
+
+    fun setItems(items: List<ItemType>) {
+        val oldItems = carouselItems
+        carouselItems = items
+        if (!handleDataChange(oldItems, items)) {
+            notifyDataSetChanged()
+        }
+    }
+
+    fun setItemClickListener(listener: Carousel.ItemClickListener?) {
+        itemClickListener = listener
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CarouselViewHolder {
+        return CarouselViewHolder(
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.carousel_viewholder, parent, false)
+        ).also { holder -> holder.container.setOnClickListener(holder) }
+    }
+
+    override fun getItemCount(): Int {
+        return carouselItems.size
+    }
+
+    override fun onBindViewHolder(holder: CarouselViewHolder, position: Int) {
+        holder.container.visibility = View.VISIBLE
+        holder.progressBar.visibility = View.VISIBLE
+        bindItemForPosition(holder, position)
+    }
+
+    /**
+     * Bind the item for the given position. The [holder] has three properties:
+     *
+     * * container: [RelativeLayout] to place a view into.
+     * * progressBar: [ProgressBar] to show indeterminate progress status
+     * * error: [ImageView] to show an error indicator
+     */
+    abstract fun bindItemForPosition(holder: CarouselViewHolder, position: Int)
+
+    inner class CarouselViewHolder(view: View)
+        : RecyclerView.ViewHolder(view), View.OnClickListener {
+        val container: RelativeLayout = view.findViewById(R.id.viewContainer)
+        val progressBar: ProgressBar = view.findViewById(R.id.progressBar)
+
+        override fun onClick(v: View?) {
+            val position = adapterPosition
+            itemClickListener?.onItemClicked(container.getChildAt(0), position)
+        }
+    }
+
+}

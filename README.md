@@ -11,13 +11,24 @@ Comes with two built-in adapters to quick-start
 binding behaviour to the custom object type `CarouselImage` that was created for handling loading
 of either a resource or a `Uri` image.
 
-As can be seen, this is a very versatile Carousel - all it needs is some implementation of a
+Built with versatility in mind. All the Carousel needs is some implementation of a
 `CarouselAdapter`. Simply instantiate the Carousel in your activity or fragment, create the adapter,
 and attach it. Everything else is handled for you.
 
 Currently active item indicators are also automatically created and kept in sync
 with the carousel's ViewPager.
 
+## Get it
+Availability is a work-in-progress.
+
+See [RecyclerView Releases](https://developer.android.com/jetpack/androidx/releases/recyclerview) for the latest RecyclerView version(s)
+
+```
+implementation 'androidx.recyclerview:recyclerview:1.1.0-beta04'
+implementation 'com.meetarp:carousel:1.0.0'
+```
+
+## Customizability
 Has multiple defined attributes that you can specify in your XML layout or manipulate programmatically:
 
 |XML Attribute|Description|Default|
@@ -85,8 +96,8 @@ imagesAdapter.setItemClickListener(object : Carousel.ItemClickListener {
 // Give the carousel the adapter
 imageResCarousel.adapter = imagesAdapter
 
-// Listen for page changes if you're interested in that information
-imageResCarousel.pageChangeListener = object : Carousel.PageChangeListener {
+// Listen for paging events if you're interested in that information
+imageResCarousel.pageChangeListener = object : ViewPager2.OnPageChangeCallback {
     override fun onPageSelected(position: Int) {
         // ... do something
     }
@@ -97,13 +108,30 @@ carousel.carouselBackgroundColor = ContextCompat.getColor(context, R.color.grey)
 carousel.showIndicators = true
 carousel.indicatorPosition = Carousel.IndicatorPosition.START
 carousel.insetIndicators = false
-carousel.indicatorOffset = dpToPx(20f).toInt()
+carousel.indicatorOffset = dpAsPx(20f)
 carousel.indicatorColor = ContextCompat.getColor(context, R.color.royal_blue)
-carousel.indicatorSize = dpToPx(8f).toInt()
-carousel.indicatorSpacing = dpToPx(12f).toInt()
+carousel.indicatorSize = dpAsPx(8f)
+carousel.indicatorSpacing = dpAsPx(12f)
 carousel.indicatorActiveScaleFactor = 1.5f
 ```
 
 And that's all you need to do.
+
+## Working with data
+
+If you find that you need to update your carousel items after its initial population,
+you will have to call `adapter.setItems(newList)` with the new data.
+
+The default handling of this data swap is a call to `notifyDataSetChanged()`.
+
+However, there is an opportunity to handle the data change event in a way
+of your own choosing (e.g. using `DiffUtils` and avoiding `notifyDataSetChanged()`)
+if the adapter has provided an override for `handleDataChange(oldList, newList)` 
+and returned true.
+
+The default return value for `handleDataChange(oldList, newList)` is false.
+
+Please see `CarouselAdapter.setItems()` if this is unclear.
+
 
 ![Carousel example](carousel.webm)
