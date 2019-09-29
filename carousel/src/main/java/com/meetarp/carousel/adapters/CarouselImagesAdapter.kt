@@ -18,8 +18,11 @@ open class CarouselImagesAdapter : CarouselAdapter<CarouselImage>() {
         }
     }
 
-    override fun bindItemForPosition(holder: CarouselViewHolder, position: Int) {
-        val carouselImage = carouselItems[position]
+    override fun bindItemForPosition(
+        holder: CarouselViewHolder,
+        position: Int,
+        item: CarouselImage
+    ) {
         val container = holder.container
 
         val imageView: ImageView =
@@ -30,7 +33,7 @@ open class CarouselImagesAdapter : CarouselAdapter<CarouselImage>() {
                 ImageView(container.context).also { container.addView(it) }
             }
 
-        carouselImage.loadInto(imageView, this, holder)
+        item.loadInto(imageView, this, holder)
     }
 
 }

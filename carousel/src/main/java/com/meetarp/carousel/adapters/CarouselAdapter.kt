@@ -3,7 +3,6 @@ package com.meetarp.carousel.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import androidx.recyclerview.widget.RecyclerView
@@ -13,7 +12,7 @@ import com.meetarp.carousel.R
 abstract class CarouselAdapter<ItemType>
     : RecyclerView.Adapter<CarouselAdapter<ItemType>.CarouselViewHolder>() {
 
-    protected var carouselItems: List<ItemType> = listOf()
+    private var carouselItems: List<ItemType> = listOf()
     private var itemClickListener: Carousel.ItemClickListener? = null
 
     open fun handleDataChange(
@@ -47,17 +46,24 @@ abstract class CarouselAdapter<ItemType>
     override fun onBindViewHolder(holder: CarouselViewHolder, position: Int) {
         holder.container.visibility = View.VISIBLE
         holder.progressBar.visibility = View.VISIBLE
-        bindItemForPosition(holder, position)
+        bindItemForPosition(holder, position, carouselItems[position])
     }
 
     /**
-     * Bind the item for the given position. The [holder] has three properties:
+     * Bind the item for the given position. The [holder] has two properties:
      *
-     * * container: [RelativeLayout] to place a view into.
+     * * container: [RelativeLayout] to place content into.
      * * progressBar: [ProgressBar] to show indeterminate progress status
-     * * error: [ImageView] to show an error indicator
+     *
+     * @param holder The ViewHolder for the carousel position.
+     * @param position The carousel position.
+     * @param item The item corresponding to the carousel position.
      */
-    abstract fun bindItemForPosition(holder: CarouselViewHolder, position: Int)
+    abstract fun bindItemForPosition(
+        holder: CarouselViewHolder,
+        position: Int,
+        item: ItemType
+    )
 
     inner class CarouselViewHolder(view: View)
         : RecyclerView.ViewHolder(view), View.OnClickListener {
@@ -66,7 +72,7 @@ abstract class CarouselAdapter<ItemType>
 
         override fun onClick(v: View?) {
             val position = adapterPosition
-            itemClickListener?.onItemClicked(container.getChildAt(0), position)
+            itemClickListener?.onItemClicked(container, position)
         }
     }
 

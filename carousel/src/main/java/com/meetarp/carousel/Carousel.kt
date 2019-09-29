@@ -7,6 +7,7 @@ import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.Interpolator
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -41,7 +42,7 @@ class Carousel<ItemType> @JvmOverloads constructor(
     enum class IndicatorPosition { TOP, BOTTOM, START, END }
 
     interface ItemClickListener {
-        fun onItemClicked(view: View, position: Int)
+        fun onItemClicked(container: ViewGroup, position: Int)
     }
 
     // region Layout elements
