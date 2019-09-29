@@ -83,7 +83,7 @@ images.add(UriImage(Uri.parse("https://example.me/image2.jpg")))
 images.add(ResourceImage(R.drawable.image3))
 
 // Create the adapter and set the items
-val imagesAdapter = CarouselImagesAdapter(context)
+val imagesAdapter = CarouselImagesAdapter()
 imagesAdapter.setItems(images)
 
 // Attach a click listener, if you want.
