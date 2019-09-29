@@ -88,7 +88,7 @@ imagesAdapter.setItems(images)
 
 // Attach a click listener, if you want.
 imagesAdapter.setItemClickListener(object : Carousel.ItemClickListener {
-    override fun onItemClicked(view: View, position: Int) {
+    override fun onItemClicked(container: ViewGroup, position: Int) {
         // ... do something
     }
 })
