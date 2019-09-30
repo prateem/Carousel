@@ -74,7 +74,7 @@ recommended that they be of similar (if not identical) heights.
 #### In Activity/Fragment
 ```kotlin
 // Capture the reference to the carousel
-val imageCarousel: Carousel<CarouselImage> = findViewById(R.id.carousel)
+val carousel: Carousel<CarouselImage> = findViewById(R.id.carousel)
 
 // Populate the image list with drawables
 val images = mutableListOf<CarouselImage>()
@@ -94,10 +94,10 @@ imagesAdapter.setItemClickListener(object : Carousel.ItemClickListener {
 })
 
 // Give the carousel the adapter
-imageResCarousel.adapter = imagesAdapter
+carousel.adapter = imagesAdapter
 
 // Listen for paging events if you're interested in that information
-imageResCarousel.pageChangeListener = object : ViewPager2.OnPageChangeCallback {
+carousel.pageChangeListener = object : ViewPager2.OnPageChangeCallback {
     override fun onPageSelected(position: Int) {
         // ... do something
     }
