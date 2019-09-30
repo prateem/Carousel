@@ -4,12 +4,13 @@ A carousel for Android applications with built-in page indicators.
 Implemented as a custom view that renders a carousel leveraging ViewPager2, with an
 extensible Adapter system that allows you to build the carousel you want.
 
-Comes with two built-in adapters to quick-start, both of which are marked as `open`:
+The example application has two bare-bones adapter implementations that can function
+as a quick-start, both of which are marked as `open`:
 
 * `CarouselViewsAdapter` for a simple, generic View adapter.
 * `CarouselImagesAdapter` as an example of a slightly more involved adapter that delegates
 binding behaviour to the custom object type `CarouselImage` that was created for handling loading
-of either a resource or a `Uri` image.
+of either a resource or a `Uri` image via [Coil](https://coil-kt.github.io/coil/).
 
 Built with versatility in mind. All the Carousel needs is some implementation of a
 `CarouselAdapter`. Simply instantiate the Carousel in your activity or fragment, create the adapter,
@@ -21,10 +22,10 @@ with the carousel's ViewPager.
 ## Get it
 Availability is a work-in-progress.
 
-See [RecyclerView Releases](https://developer.android.com/jetpack/androidx/releases/recyclerview) for the latest RecyclerView version(s)
+See [ViewPager2 Releases](https://developer.android.com/jetpack/androidx/releases/viewpager2) for the latest ViewPager2 version(s)
 
 ```
-implementation 'androidx.recyclerview:recyclerview:1.1.0-beta04'
+implementation 'androidx.viewpager2:viewpager2:1.0.0-beta04'
 implementation 'com.meetarp:carousel:1.0.0'
 ```
 

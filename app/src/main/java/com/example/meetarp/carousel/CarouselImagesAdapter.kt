@@ -1,15 +1,16 @@
-package com.meetarp.carousel.adapters
+package com.example.meetarp.carousel
 
 import android.content.Context
 import android.view.View
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import com.meetarp.carousel.R
-import com.meetarp.carousel.data.CarouselImage
+import com.meetarp.carousel.CarouselAdapter
+import com.example.meetarp.carousel.data.CarouselImage
 
-open class CarouselImagesAdapter : CarouselAdapter<CarouselImage>() {
+class CarouselImagesAdapter : CarouselAdapter<CarouselImage>() {
 
-    open fun getErrorView(context: Context): View? {
+    fun getErrorView(context: Context): View? {
         val iconSize = context.resources.getDimensionPixelSize(R.dimen.error_icon_size)
 
         return ImageView(context).also {

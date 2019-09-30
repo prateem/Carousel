@@ -1,4 +1,4 @@
-package com.meetarp.carousel.data
+package com.example.meetarp.carousel.data
 
 import android.net.Uri
 import android.util.Log
@@ -6,8 +6,8 @@ import android.view.View
 import android.widget.ImageView
 import coil.api.load
 import coil.size.PixelSize
-import com.meetarp.carousel.adapters.CarouselAdapter
-import com.meetarp.carousel.adapters.CarouselImagesAdapter
+import com.example.meetarp.carousel.CarouselImagesAdapter
+import com.meetarp.carousel.CarouselAdapter
 
 open class UriImage(private val uri: Uri) : CarouselImage() {
 

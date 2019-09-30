@@ -40,7 +40,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
-import com.meetarp.carousel.adapters.CarouselAdapter
 import kotlin.math.abs
 
 /**

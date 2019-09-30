@@ -11,11 +11,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.meetarp.carousel.Carousel
-import com.meetarp.carousel.adapters.CarouselImagesAdapter
-import com.meetarp.carousel.adapters.CarouselViewsAdapter
-import com.meetarp.carousel.data.CarouselImage
-import com.meetarp.carousel.data.ResourceImage
-import com.meetarp.carousel.data.UriImage
+import com.example.meetarp.carousel.data.CarouselImage
+import com.example.meetarp.carousel.data.ResourceImage
+import com.example.meetarp.carousel.data.UriImage
 
 class MainActivity : AppCompatActivity() {
 

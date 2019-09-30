@@ -1,4 +1,4 @@
-package com.meetarp.carousel.adapters
+package com.meetarp.carousel
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,8 +6,6 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import androidx.recyclerview.widget.RecyclerView
-import com.meetarp.carousel.Carousel
-import com.meetarp.carousel.R
 
 abstract class CarouselAdapter<ItemType>
     : RecyclerView.Adapter<CarouselAdapter<ItemType>.CarouselViewHolder>() {

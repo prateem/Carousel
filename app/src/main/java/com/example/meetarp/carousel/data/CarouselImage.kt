@@ -1,7 +1,7 @@
-package com.meetarp.carousel.data
+package com.example.meetarp.carousel.data
 
 import android.widget.ImageView
-import com.meetarp.carousel.adapters.CarouselAdapter
+import com.meetarp.carousel.CarouselAdapter
 
 abstract class CarouselImage {
 
