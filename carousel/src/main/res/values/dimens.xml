@@ -3,5 +3,4 @@
     <dimen name="default_indicator_offset">16dp</dimen>
     <dimen name="default_indicator_spacing">10dp</dimen>
     <dimen name="default_indicator_size">5dp</dimen>
-    <dimen name="error_icon_size">45dp</dimen>
 </resources>

@@ -6,9 +6,9 @@
     android:height="384dp"
     android:viewportWidth="384"
     android:viewportHeight="384">
-  <path
-      android:fillColor="@android:color/black"
-      android:pathData="M341.333,0
+    <path
+        android:fillColor="@android:color/black"
+        android:pathData="M341.333,0
       H42.667
       C19.2,0 0,19.2 0,42.667
       V140.8l64,64
@@ -18,9 +18,9 @@
       v-140.8
       C384,19.2 364.8,0 341.333,0
       z"/>
-  <path
-      android:fillColor="@android:color/darker_gray"
-      android:pathData="
+    <path
+        android:fillColor="@android:color/darker_gray"
+        android:pathData="
       M234.667,264.533
       L149.333,179.2
       L64,264.533
