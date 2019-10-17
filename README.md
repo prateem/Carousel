@@ -20,7 +20,7 @@ Currently active item indicators are also automatically created and kept in sync
 with the carousel's ViewPager.
 
 ## Get it
-Availability is a work-in-progress.
+Available on jCenter.
 
 See [ViewPager2 Releases](https://developer.android.com/jetpack/androidx/releases/viewpager2) for the latest ViewPager2 version(s)
 
