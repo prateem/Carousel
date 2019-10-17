@@ -25,8 +25,8 @@ Availability is a work-in-progress.
 See [ViewPager2 Releases](https://developer.android.com/jetpack/androidx/releases/viewpager2) for the latest ViewPager2 version(s)
 
 ```
-implementation 'androidx.viewpager2:viewpager2:1.0.0-beta04'
-implementation 'com.meetarp:carousel:1.0.0'
+implementation 'androidx.viewpager2:viewpager2:1.0.0-beta05'
+implementation 'com.meetarp:carousel:0.0.1'
 ```
 
 ## Customizability
