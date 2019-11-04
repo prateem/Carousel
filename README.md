@@ -24,7 +24,7 @@ you are not interested in this pre-packaged ViewHolder, `onCreateViewHolder` and
 Currently active item indicators are also automatically created and kept in sync
 with the carousel's ViewPager.
 
-![Carousel example](carousel.webm)
+![Carousel example](carousel.gif)
 
 ## Get it
 Available on jCenter.
