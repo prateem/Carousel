@@ -7,17 +7,34 @@ import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import androidx.recyclerview.widget.RecyclerView
 
+/**
+ * Adapter for [Carousel] with a default [RecyclerView.ViewHolder] implementation that includes
+ * a loading spinner and a simple / default error image for use.
+ */
 abstract class CarouselAdapter<ItemType>
     : RecyclerView.Adapter<CarouselAdapter<ItemType>.CarouselViewHolder>() {
 
-    private var carouselItems: List<ItemType> = listOf()
-    private var itemClickListener: Carousel.ItemClickListener? = null
+    /**
+     * A [Carousel.ItemClickListener] that, if set, will be called by the default
+     * view holder (if [onCreateViewHolder] is not overwritten) when a carousel item is clicked.
+     */
+    var itemClickListener: Carousel.ItemClickListener? = null
 
+    protected var carouselItems: List<ItemType> = listOf()
+
+    /**
+     * Return true if a data change event has been handled.
+     * Default behaviour is to return false.
+     * If false is returned, [notifyDataSetChanged] will be called.
+     */
     open fun handleDataChange(
         oldData: List<ItemType>,
         newData: List<ItemType>
     ): Boolean = false
 
+    /**
+     * Set the items this adapter is responsible for displaying.
+     */
     fun setItems(items: List<ItemType>) {
         val oldItems = carouselItems
         carouselItems = items
@@ -26,8 +43,8 @@ abstract class CarouselAdapter<ItemType>
         }
     }
 
-    fun setItemClickListener(listener: Carousel.ItemClickListener?) {
-        itemClickListener = listener
+    override fun getItemCount(): Int {
+        return carouselItems.size
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CarouselViewHolder {
@@ -35,10 +52,6 @@ abstract class CarouselAdapter<ItemType>
             LayoutInflater.from(parent.context)
                 .inflate(R.layout.carousel_viewholder, parent, false)
         ).also { holder -> holder.container.setOnClickListener(holder) }
-    }
-
-    override fun getItemCount(): Int {
-        return carouselItems.size
     }
 
     override fun onBindViewHolder(holder: CarouselViewHolder, position: Int) {
@@ -68,9 +81,9 @@ abstract class CarouselAdapter<ItemType>
         val container: RelativeLayout = view.findViewById(R.id.viewContainer)
         val progressBar: ProgressBar = view.findViewById(R.id.progressBar)
 
-        override fun onClick(v: View?) {
+        override fun onClick(v: View) {
             val position = adapterPosition
-            itemClickListener?.onItemClicked(container, position)
+            itemClickListener?.onItemClicked(v, position)
         }
     }
 

@@ -16,17 +16,33 @@ Built with versatility in mind. All the Carousel needs is some implementation of
 `CarouselAdapter`. Simply instantiate the Carousel in your activity or fragment, create the adapter,
 and attach it. Everything else is handled for you.
 
+Implementations of `CarouselAdapter` have a default / standard `ViewHolder` baked in,
+with a simple indeterminate loading circle for use if desired. If
+you are not interested in this pre-packaged ViewHolder, `onCreateViewHolder` and
+`onBindViewHolder` should be overridden by your custom implementation of the adapter. 
+
 Currently active item indicators are also automatically created and kept in sync
 with the carousel's ViewPager.
+
+![Carousel example](carousel.webm)
 
 ## Get it
 Available on jCenter.
 
-See [ViewPager2 Releases](https://developer.android.com/jetpack/androidx/releases/viewpager2) for the latest ViewPager2 version(s)
+`Carousel` has a co-dependency on AndroidX's RecyclerView, as adapters inherit
+from `RecyclerView.Adapter`. You can fulfill this dependency either through
+the AndroidX RecyclerView package or the ViewPager2 package.
+
+=> See [RecyclerView Releases](https://developer.android.com/jetpack/androidx/releases/recyclerview) for the latest RecyclerView version(s)
+
+=> See [ViewPager2 Releases](https://developer.android.com/jetpack/androidx/releases/viewpager2) for the latest ViewPager2 version(s)
 
 ```
-implementation 'androidx.viewpager2:viewpager2:1.0.0-beta05'
 implementation 'com.meetarp:carousel:0.0.1'
+
+// and one of...
+implementation 'androidx.viewpager2:viewpager2:$viewPager2_version'
+implementation 'androidx.recyclerview:recyclerview:$recyclerview_version'
 ```
 
 ## Customizability
@@ -88,11 +104,13 @@ val imagesAdapter = CarouselImagesAdapter()
 imagesAdapter.setItems(images)
 
 // Attach a click listener, if you want.
-imagesAdapter.setItemClickListener(object : Carousel.ItemClickListener {
-    override fun onItemClicked(container: ViewGroup, position: Int) {
+// This is a slightly improved View.OnClickListener that includes
+// carousel item position
+imagesAdapter.itemClickListener = object : Carousel.ItemClickListener {
+    override fun onItemClicked(view: View, position: Int) {
         // ... do something
     }
-})
+}
 
 // Give the carousel the adapter
 carousel.adapter = imagesAdapter
@@ -116,8 +134,6 @@ carousel.indicatorSpacing = dpAsPx(12f)
 carousel.indicatorActiveScaleFactor = 1.5f
 ```
 
-And that's all you need to do.
-
 ## Working with data
 
 If you find that you need to update your carousel items after its initial population,
@@ -126,13 +142,22 @@ you will have to call `adapter.setItems(newList)` with the new data.
 The default handling of this data swap is a call to `notifyDataSetChanged()`.
 
 However, there is an opportunity to handle the data change event in a way
-of your own choosing (e.g. using `DiffUtils` and avoiding `notifyDataSetChanged()`)
-if the adapter has provided an override for `handleDataChange(oldList, newList)` 
-and returned true.
+of your own choosing (as an example: using `DiffUtils`)
+if the adapter has provided an override for `handleDataChange(oldData, newData)` 
+and returns true.
 
-The default return value for `handleDataChange(oldList, newList)` is false.
+**The default return value for `handleDataChange(oldData, newData)` is false**.
 
 Please see `CarouselAdapter.setItems()` if this is unclear.
 
+## The default / provided ViewHolder
 
-![Carousel example](carousel.webm)
+The default implementations of `onCreateViewHolder` and `onBindViewHolder` for the
+`CarouselAdapter` abstract class provide a simple ViewHolder with publicly exposed
+members:
+
+* container (ViewGroup - RelativeLayout)
+* progressBar (ProgressBar)
+
+An example of working with these members and the default ViewHolder can be seen
+in [CarouselImagesAdapter](app/src/main/java/com/example/meetarp/carousel/CarouselImagesAdapter.kt) in the example application.
