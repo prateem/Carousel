@@ -21,6 +21,7 @@ abstract class CarouselAdapter<ItemType>
     var itemClickListener: Carousel.ItemClickListener? = null
 
     protected var carouselItems: List<ItemType> = listOf()
+    internal var itemChangeCallback: (() -> Unit)? = null
 
     /**
      * Return true if a data change event has been handled.
@@ -36,11 +37,14 @@ abstract class CarouselAdapter<ItemType>
      * Set the items this adapter is responsible for displaying.
      */
     fun setItems(items: List<ItemType>) {
+        if (carouselItems == items) return
+
         val oldItems = carouselItems
         carouselItems = items
         if (!handleDataChange(oldItems, items)) {
             notifyDataSetChanged()
         }
+        itemChangeCallback?.invoke()
     }
 
     override fun getItemCount(): Int {
