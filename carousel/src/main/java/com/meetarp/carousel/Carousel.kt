@@ -90,7 +90,10 @@ class Carousel<ItemType> @JvmOverloads constructor(
                     updateViewPadding()
                 }
             }
-            adapter?.itemChangeCallback = { setIndicators() }
+            adapter?.itemChangeCallback = {
+                setIndicators()
+                updateConstraints()
+            }
         }
 
     private var previousActiveIndex = 0
