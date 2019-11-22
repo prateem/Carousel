@@ -233,9 +233,9 @@ class Carousel<ItemType> @JvmOverloads constructor(
 
             showIndicators =
                 attributes.getBoolean(R.styleable.Carousel_carousel_showIndicators, showIndicators)
-            indicatorPosition = IndicatorPosition.values()[
-                    attributes.getInt(R.styleable.Carousel_carousel_indicatorPosition, 1)
-            ]
+            indicatorPosition = IndicatorPosition.values().let {
+                it[attributes.getInt(R.styleable.Carousel_carousel_indicatorPosition, it.indexOf(indicatorPosition))]
+            }
 
             indicatorColor =
                 attributes.getColor(R.styleable.Carousel_carousel_indicatorColor, indicatorColor)

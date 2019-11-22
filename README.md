@@ -38,7 +38,7 @@ the AndroidX RecyclerView package or the ViewPager2 package.
 => See [ViewPager2 Releases](https://developer.android.com/jetpack/androidx/releases/viewpager2) for the latest ViewPager2 version(s)
 
 ```
-implementation 'com.meetarp:carousel:1.0.1'
+implementation 'com.meetarp:carousel:1.0.2'
 
 // and one of...
 implementation 'androidx.viewpager2:viewpager2:$viewPager2_version'
