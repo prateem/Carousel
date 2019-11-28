@@ -13,8 +13,8 @@ class CarouselImagesAdapter : CarouselAdapter<CarouselImage>() {
 
     // Default gravity is START and TOP. This adapter wants the views CENTER in the container.
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CarouselViewHolder {
-        return super.onCreateViewHolder(parent, viewType)
-            .also { vh -> (vh as DefaultCarouselViewHolder).container.gravity = Gravity.CENTER }
+        return getDefaultCarouselViewHolder(parent)
+            .also { vh -> vh.container.gravity = Gravity.CENTER }
     }
 
     override fun onBindViewHolder(holder: CarouselViewHolder, position: Int) {

@@ -51,7 +51,7 @@ abstract class CarouselAdapter<ItemType>
         return carouselItems.size
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CarouselViewHolder {
+    fun getDefaultCarouselViewHolder(parent: ViewGroup): DefaultCarouselViewHolder {
         return DefaultCarouselViewHolder(
             LayoutInflater.from(parent.context)
                 .inflate(R.layout.carousel_viewholder, parent, false)

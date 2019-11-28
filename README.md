@@ -18,9 +18,12 @@ and attach it. Everything else is handled for you.
 
 Implementations of `CarouselAdapter` have a default / standard `ViewHolder` baked 
 in for use if desired - called `DefaultCarouselViewHolder`. It has a simple
-indeterminate loading circle . If you are not interested in this pre-packaged ViewHolder,
-`onCreateViewHolder` and `onBindViewHolder` should return and work with your own 
-implementation of a `CarouselAdapter.CarouselViewHolder`. 
+indeterminate loading circle . You can get an instance of this ViewHolder by calling
+`CarouselAdapter.getDefaultCarouselViewHolder(parentView)`
+
+If you are not interested in this pre-packaged ViewHolder, `onCreateViewHolder`
+and `onBindViewHolder` should return and work with your own implementation of
+a `CarouselAdapter.CarouselViewHolder`.
 
 Currently active item indicators are also automatically created and kept in sync
 with the carousel's ViewPager.
@@ -39,7 +42,7 @@ the AndroidX RecyclerView package or the ViewPager2 package.
 => See [ViewPager2 Releases](https://developer.android.com/jetpack/androidx/releases/viewpager2) for the latest ViewPager2 version(s)
 
 ```
-implementation 'com.meetarp:carousel:1.0.4'
+implementation 'com.meetarp:carousel:1.0.5'
 
 // and one of...
 implementation 'androidx.viewpager2:viewpager2:$viewPager2_version'
@@ -147,7 +150,7 @@ override fun onBindViewHolder(holder: CarouselViewHolder, position: Int) {
 }
 ```
 
-## Working with data
+## Working with changing data
 
 If you find that you need to update your carousel items after its initial population,
 you will have to call `adapter.setItems(newList)` with the new data.
@@ -165,9 +168,8 @@ Please see `CarouselAdapter.setItems()` if this is unclear.
 
 ## DefaultCarouselViewHolder
 
-The default implementations of `onCreateViewHolder` and `onBindViewHolder` for the
-`CarouselAdapter` abstract class provide an instance of `DefaultCarouselViewHolder`
-with publicly exposed members:
+`CarouselAdapter.getDefaultCarouselViewHolder(parentView)` provides an instance
+of `DefaultCarouselViewHolder` with publicly exposed members:
 
 * container (ViewGroup - RelativeLayout)
 * progressBar (ProgressBar)
