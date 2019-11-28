@@ -1,3 +1,5 @@
+![Latest release](https://img.shields.io/bintray/v/prateem/maven/carousel?label=latest&style=flat-square)
+
 # Carousel for Android
 A carousel for Android applications with built-in page indicators.
 
@@ -31,6 +33,8 @@ with the carousel's ViewPager.
 ![Carousel example](carousel.gif)
 
 ## Get it
+![Latest release](https://img.shields.io/bintray/v/prateem/maven/carousel?label=latest&style=flat-square)
+
 Available on jCenter.
 
 `Carousel` has a co-dependency on AndroidX's RecyclerView, as adapters inherit
@@ -42,7 +46,7 @@ the AndroidX RecyclerView package or the ViewPager2 package.
 => See [ViewPager2 Releases](https://developer.android.com/jetpack/androidx/releases/viewpager2) for the latest ViewPager2 version(s)
 
 ```
-implementation 'com.meetarp:carousel:1.0.5'
+implementation 'com.meetarp:carousel:$carouselVersion'
 
 // and one of...
 implementation 'androidx.viewpager2:viewpager2:$viewPager2_version'
