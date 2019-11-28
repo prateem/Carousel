@@ -16,6 +16,8 @@ open class UriImage(private val uri: Uri) : CarouselImage() {
         adapter: CarouselAdapter<CarouselImage>,
         viewHolder: CarouselAdapter<CarouselImage>.CarouselViewHolder
     ) {
+        viewHolder as CarouselAdapter.DefaultCarouselViewHolder
+
         viewHolder.container.post {
             imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
             imageView.load(uri) {

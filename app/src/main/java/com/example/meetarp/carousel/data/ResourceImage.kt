@@ -11,6 +11,8 @@ class ResourceImage(private val resId: Int) : CarouselImage() {
         adapter: CarouselAdapter<CarouselImage>,
         viewHolder: CarouselAdapter<CarouselImage>.CarouselViewHolder
     ) {
+        viewHolder as CarouselAdapter.DefaultCarouselViewHolder
+
         viewHolder.progressBar.visibility = View.GONE
         imageView.setImageResource(resId)
     }

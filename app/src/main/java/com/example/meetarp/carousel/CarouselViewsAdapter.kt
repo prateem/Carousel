@@ -10,10 +10,14 @@ class CarouselViewsAdapter : CarouselAdapter<View>() {
     // Default gravity is START and TOP. This adapter wants the views CENTER in the container.
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CarouselViewHolder {
         return super.onCreateViewHolder(parent, viewType)
-            .also { vh -> vh.container.gravity = Gravity.CENTER }
+            .also { vh -> (vh as DefaultCarouselViewHolder).container.gravity = Gravity.CENTER }
     }
 
-    override fun bindItemForPosition(holder: CarouselViewHolder, position: Int, item: View) {
+    override fun onBindViewHolder(holder: CarouselViewHolder, position: Int) {
+        holder as DefaultCarouselViewHolder
+        val item = carouselItems[position]
+
+        holder.container.visibility = View.VISIBLE
         holder.progressBar.visibility = View.GONE
         holder.container.removeAllViews()
         holder.container.addView(item)

@@ -52,36 +52,16 @@ abstract class CarouselAdapter<ItemType>
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CarouselViewHolder {
-        return CarouselViewHolder(
+        return DefaultCarouselViewHolder(
             LayoutInflater.from(parent.context)
                 .inflate(R.layout.carousel_viewholder, parent, false)
         ).also { holder -> holder.container.setOnClickListener(holder) }
     }
 
-    override fun onBindViewHolder(holder: CarouselViewHolder, position: Int) {
-        holder.container.visibility = View.VISIBLE
-        holder.progressBar.visibility = View.VISIBLE
-        bindItemForPosition(holder, position, carouselItems[position])
-    }
+    abstract inner class CarouselViewHolder(view: View) : RecyclerView.ViewHolder(view)
 
-    /**
-     * Bind the item for the given position. The [holder] has two properties:
-     *
-     * * container: [RelativeLayout] to place content into.
-     * * progressBar: [ProgressBar] to show indeterminate progress status
-     *
-     * @param holder The ViewHolder for the carousel position.
-     * @param position The carousel position.
-     * @param item The item corresponding to the carousel position.
-     */
-    abstract fun bindItemForPosition(
-        holder: CarouselViewHolder,
-        position: Int,
-        item: ItemType
-    )
-
-    inner class CarouselViewHolder(view: View)
-        : RecyclerView.ViewHolder(view), View.OnClickListener {
+    inner class DefaultCarouselViewHolder(view: View)
+        : CarouselViewHolder(view), View.OnClickListener {
         val container: RelativeLayout = view.findViewById(R.id.viewContainer)
         val progressBar: ProgressBar = view.findViewById(R.id.progressBar)
 

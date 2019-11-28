@@ -16,10 +16,11 @@ Built with versatility in mind. All the Carousel needs is some implementation of
 `CarouselAdapter`. Simply instantiate the Carousel in your activity or fragment, create the adapter,
 and attach it. Everything else is handled for you.
 
-Implementations of `CarouselAdapter` have a default / standard `ViewHolder` baked in,
-with a simple indeterminate loading circle for use if desired. If
-you are not interested in this pre-packaged ViewHolder, `onCreateViewHolder` and
-`onBindViewHolder` should be overridden by your custom implementation of the adapter. 
+Implementations of `CarouselAdapter` have a default / standard `ViewHolder` baked 
+in for use if desired - called `DefaultCarouselViewHolder`. It has a simple
+indeterminate loading circle . If you are not interested in this pre-packaged ViewHolder,
+`onCreateViewHolder` and `onBindViewHolder` should return and work with your own 
+implementation of a `CarouselAdapter.CarouselViewHolder`. 
 
 Currently active item indicators are also automatically created and kept in sync
 with the carousel's ViewPager.
@@ -38,7 +39,7 @@ the AndroidX RecyclerView package or the ViewPager2 package.
 => See [ViewPager2 Releases](https://developer.android.com/jetpack/androidx/releases/viewpager2) for the latest ViewPager2 version(s)
 
 ```
-implementation 'com.meetarp:carousel:1.0.3'
+implementation 'com.meetarp:carousel:1.0.4'
 
 // and one of...
 implementation 'androidx.viewpager2:viewpager2:$viewPager2_version'
@@ -134,6 +135,18 @@ carousel.indicatorSpacing = dpAsPx(12f)
 carousel.indicatorActiveScaleFactor = 1.5f
 ```
 
+#### The Adapter
+`CarouselAdapter` is an adapter with a slight implementation on top of
+`RecyclerView.Adapter`. You can retrieve an item passed to the adapter from
+`setItems(...)` by accessing the `carouselItems` protected member:
+
+```
+override fun onBindViewHolder(holder: CarouselViewHolder, position: Int) {
+    val item = carouselItems[position]
+    // ... do something with the item
+}
+```
+
 ## Working with data
 
 If you find that you need to update your carousel items after its initial population,
@@ -150,11 +163,11 @@ and returns true.
 
 Please see `CarouselAdapter.setItems()` if this is unclear.
 
-## The default / provided ViewHolder
+## DefaultCarouselViewHolder
 
 The default implementations of `onCreateViewHolder` and `onBindViewHolder` for the
-`CarouselAdapter` abstract class provide a simple ViewHolder with publicly exposed
-members:
+`CarouselAdapter` abstract class provide an instance of `DefaultCarouselViewHolder`
+with publicly exposed members:
 
 * container (ViewGroup - RelativeLayout)
 * progressBar (ProgressBar)
