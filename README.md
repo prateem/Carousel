@@ -1,4 +1,4 @@
-[![Latest release](https://img.shields.io/bintray/v/prateem/maven/carousel?label=latest&style=flat-square)][#]
+[![Latest release](https://img.shields.io/bintray/v/prateem/maven/carousel?label=latest&style=flat-square)]()
 
 # Carousel for Android
 A carousel for Android applications with built-in page indicators.
@@ -33,7 +33,7 @@ with the carousel's ViewPager.
 ![Carousel example](carousel.gif)
 
 ## Get it
-[![Latest release](https://img.shields.io/bintray/v/prateem/maven/carousel?label=latest&style=flat-square)][#]
+[![Latest release](https://img.shields.io/bintray/v/prateem/maven/carousel?label=latest&style=flat-square)]()
 
 Available on jCenter.
 
